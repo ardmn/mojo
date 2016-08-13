@@ -37,13 +37,13 @@ class ShapesApp : public mojo::ApplicationImplBase {
 
   void CreateFramebuffer() { provider_->Create(CallCreateSurface(this)); }
 
-  void CreateSurface(mojo::InterfaceHandle<mojo::Framebuffer> frame_buffer,
+  void CreateSurface(mojo::InterfaceHandle<mojo::Framebuffer> framebuffer,
                      mojo::FramebufferInfoPtr info) {
-    if (!frame_buffer) {
-      fprintf(stderr, "Failed to create frame buffer\n");
+    if (!framebuffer) {
+      fprintf(stderr, "Failed to create framebuffer\n");
       return;
     }
-    frame_buffer_.Bind(std::move(frame_buffer));
+    framebuffer_.Bind(std::move(framebuffer));
     info_ = std::move(info);
 
     uintptr_t buffer = 0;
@@ -55,7 +55,7 @@ class ShapesApp : public mojo::ApplicationImplBase {
                           MX_VM_FLAG_PERM_READ | MX_VM_FLAG_PERM_WRITE);
 
     if (status < 0) {
-      fprintf(stderr, "Cannot map frame buffer %d\n", status);
+      fprintf(stderr, "Cannot map framebuffer %d\n", status);
       mojo::RunLoop::current()->Quit();
       return;
     }
@@ -96,7 +96,7 @@ class ShapesApp : public mojo::ApplicationImplBase {
     canvas->drawCircle(x_, y_, 200.0f, paint);
     canvas->flush();
 
-    frame_buffer_->Flush([this]() { Draw(); });
+    framebuffer_->Flush([this]() { Draw(); });
   }
 
  private:
@@ -104,9 +104,9 @@ class ShapesApp : public mojo::ApplicationImplBase {
    public:
     explicit CallCreateSurface(ShapesApp* app) : app_(app) {}
 
-    void Run(mojo::InterfaceHandle<mojo::Framebuffer> frame_buffer,
+    void Run(mojo::InterfaceHandle<mojo::Framebuffer> framebuffer,
              mojo::FramebufferInfoPtr info) const {
-      app_->CreateSurface(std::move(frame_buffer), std::move(info));
+      app_->CreateSurface(std::move(framebuffer), std::move(info));
     }
 
    private:
@@ -114,7 +114,7 @@ class ShapesApp : public mojo::ApplicationImplBase {
   };
 
   mojo::FramebufferProviderPtr provider_;
-  mojo::FramebufferPtr frame_buffer_;
+  mojo::FramebufferPtr framebuffer_;
   mojo::FramebufferInfoPtr info_;
   sk_sp<SkSurface> surface_;
   float x_ = 400.0f;
