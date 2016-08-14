@@ -12,7 +12,7 @@
 
 #include <launchpad/launchpad.h>
 #include <magenta/processargs.h>
-#include <magenta/types.h>
+#include <magenta/syscalls.h>
 #include <mxio/util.h>
 
 #include "lib/ftl/files/unique_fd.h"
@@ -38,17 +38,6 @@ void Ignored(bool success) {
   // filling the data pipe with content, that could just mean the content
   // handler wasn't interested in the data and closed its end of the pipe before
   // reading all the data.
-}
-
-size_t CloneStdStreams(mx_handle_t* handles, uint32_t* ids) {
-  size_t index = 0;
-  for (int fd = 0; fd < 3; fd++) {
-    mx_status_t result = mxio_clone_fd(fd, fd, handles + index, ids + index);
-    if (result <= 0)
-      continue;
-    index += result;
-  }
-  return index;
 }
 
 std::string GetPathFromApplicationName(const std::string& name) {
@@ -95,44 +84,23 @@ mojo::InterfaceRequest<mojo::Application> LaunchWithContentHandler(
 mtl::UniqueHandle LaunchWithProcess(
     const std::string& path,
     mojo::InterfaceRequest<mojo::Application> request) {
-  // We need room for:
-  //
-  //  * stdin/stdout/stderr
-  //  * The mxio root (for framebuffer)
-  //  * The shell handle
-  //  * The process handle
-  mx_handle_t child_handles[6 * MXIO_MAX_HANDLES];
-  uint32_t ids[6 * MXIO_MAX_HANDLES];
-
-  // TODO(abarth): Remove stdin, stdout, and stderr.
-  size_t index = CloneStdStreams(child_handles, ids);
-
-  // The framebuffer app is a special snowflake because it needs access to the
-  // device tree to talk to the virtual console.
-  // TODO(abarth): Find a more structured way to define which apps should have
-  // elevated privileges.
-  if (path == "/boot/apps/framebuffer") {
-    mx_status_t status = mxio_clone_root(&child_handles[index], &ids[index]);
-    if (status < 0) {
-      fprintf(stderr, "Failed to clone mxio root: %d", status);
-    } else {
-      index += status;
-    }
-  }
-
-  mojo::Handle initial_handle = request.PassMessagePipe().release();
-  child_handles[index] = static_cast<mx_handle_t>(initial_handle.value());
-  ids[index] = MX_HND_TYPE_APPLICATION_REQUEST;
-  ++index;
-
   const char* path_arg = path.c_str();
-  // TODO(abarth): Remove const_cast once MG-185 is fixed.
-  char** argv = const_cast<char**>(&path_arg);
-  // TODO: We probably shouldn't pass environ, but currently this is very useful
-  // as a way to tell the loader in the child process to print out load
-  // addresses so we can understand crashes.
-  return mtl::UniqueHandle(
-      launchpad_launch(path_arg, 1, argv, environ, index, child_handles, ids));
+  mx_handle_t request_handle =
+      static_cast<mx_handle_t>(request.PassMessagePipe().release().value());
+  uint32_t request_id = MX_HND_TYPE_APPLICATION_REQUEST;
+  // TODO(abarth): We shouldn't pass stdin, stdout, stderr, or the file system
+  // when launching Mojo applications. We probably shouldn't pass environ, but
+  // currently this is very useful as a way to tell the loader in the child
+  // process to print out load addresses so we can understand crashes.
+  mx_handle_t result = launchpad_launch_mxio_etc(
+      path_arg, 1, &path_arg, environ, 1, &request_handle, &request_id);
+  if (result < 0) {
+    // launchpad_launch is inconsistent about whether it closes this handles
+    // for us.  See MG-239.
+    mx_handle_close(request_handle);
+    return mtl::UniqueHandle();
+  }
+  return mtl::UniqueHandle(result);
 }
 
 }  // namespace

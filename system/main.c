@@ -4,8 +4,8 @@
 
 #include <magenta/processargs.h>
 #include <mojo/system/main.h>
-#include <runtime/process.h>
+#include <mxio/util.h>
 
 int main(int argc, char** argv) {
-  return MojoMain(mxr_process_get_handle(MX_HND_TYPE_APPLICATION_REQUEST));
+  return MojoMain(mxio_get_startup_handle(MX_HND_TYPE_APPLICATION_REQUEST));
 }
