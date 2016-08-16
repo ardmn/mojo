@@ -6,9 +6,9 @@
 
 #include <stdio.h>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/tests/validation_test_input_parser.h"
 #include "mojo/public/cpp/test_support/test_support.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {

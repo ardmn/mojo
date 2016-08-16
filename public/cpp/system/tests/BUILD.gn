@@ -17,9 +17,8 @@ mojo_sdk_source_set("tests") {
     "wait_unittest.cc",
   ]
 
-  deps = [
-    "//third_party/gtest",
+  mojo_sdk_deps = [
+    "mojo/public:gtest",
+    "mojo/public/cpp/system",
   ]
-
-  mojo_sdk_deps = [ "mojo/public/cpp/system" ]
 }

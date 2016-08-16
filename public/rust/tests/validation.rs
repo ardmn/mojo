@@ -25,7 +25,8 @@ use util::mojom_validation::*;
 /// Given a test name, it will generate a test function. In this test function
 /// we perform the following steps:
 ///   1. Decode the header of the validation input.
-///   3. Decode the payload of the validation input.
+///   2. Decode the payload of the validation input, expecting a validation
+///      error.
 ///
 macro_rules! validation_tests {
     ($($name:ident => $req_type:ident;)*) => {
@@ -124,4 +125,7 @@ validation_tests! {
     resp_conformance_msghdr_invalid_response_flags1 => ConformanceTestInterfaceResponseOption;
     resp_conformance_msghdr_invalid_response_flags2 => ConformanceTestInterfaceResponseOption;
     resp_conformance_msghdr_no_such_method => ConformanceTestInterfaceResponseOption;
+    integration_intf_resp_mthd0_unexpected_array_header => IntegrationTestInterfaceResponseOption;
+    integration_intf_rqst_mthd0_unexpected_struct_header => IntegrationTestInterfaceRequestOption;
+    integration_msghdr_invalid_flags => IntegrationTestInterfaceRequestOption;
 }

@@ -14,11 +14,11 @@
 #include <functional>
 #include <string>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/tests/validation_util.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/cpp/test_support/test_support.h"
 #include "mojo/public/interfaces/bindings/tests/validation_test_interfaces.mojom-c.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 using mojo::test::EnumerateSourceRootRelativeDirectory;
 

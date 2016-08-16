@@ -5,6 +5,7 @@
 #include <utility>
 #include <vector>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/array.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/public/cpp/bindings/lib/array_internal.h"
@@ -17,7 +18,6 @@
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/public/interfaces/bindings/tests/test_structs.mojom.h"
 #include "mojo/public/interfaces/bindings/tests/test_unions.mojom.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {

@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 // This will copy the supplied |in_struct| and compare it against the new
 // copy, expecting them to be the same. It compares the encoded version to be

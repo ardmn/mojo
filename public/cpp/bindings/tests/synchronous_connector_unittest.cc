@@ -5,12 +5,13 @@
 #include "mojo/public/cpp/bindings/lib/synchronous_connector.h"
 
 #include <string.h>
+
 #include <string>
 #include <utility>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/lib/message_builder.h"
 #include "mojo/public/cpp/bindings/message.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {

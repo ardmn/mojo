@@ -14,11 +14,8 @@ mojo_sdk_source_set("tests") {
     "logging_unittest.cc",
   ]
 
-  deps = [
-    "//third_party/gtest",
-  ]
-
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/c:environment",
     "mojo/public/cpp/bindings:callback",
     "mojo/public/cpp/environment:standalone",
@@ -35,11 +32,8 @@ mojo_sdk_source_set("perftests") {
     "run_loop_async_wait_perftest.cc",
   ]
 
-  deps = [
-    "//third_party/gtest",
-  ]
-
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/c:environment_perftest_helpers",
     "mojo/public/cpp/environment:standalone",
     "mojo/public/cpp/system",

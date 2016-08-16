@@ -8,10 +8,10 @@
 
 #include <mojo/bindings/array.h>
 
+#include "gtest/gtest.h"
 #include "mojo/public/c/tests/bindings/testing_util.h"
 #include "mojo/public/interfaces/bindings/tests/test_structs.mojom-c.h"
 #include "mojo/public/interfaces/bindings/tests/test_unions.mojom-c.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace {
 

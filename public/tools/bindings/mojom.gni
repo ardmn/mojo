@@ -301,16 +301,26 @@ template("mojom") {
         rebase_path([ "mojo/public/build/config:mojo_sdk" ], ".", mojo_root)
 
     public_deps = rebase_path([ "mojo/public/c:bindings" ], ".", mojo_root)
-    foreach(d, rebased_mojo_sdk_public_deps) {
-      full_name = get_label_info(d, "label_no_toolchain")
-      public_deps += [ "${full_name}_c" ]
+    deps = []
+    c_public_deps = []
+    c_deps = []
+
+    # Bring in |invoker.public_deps| and |invoker.deps|.
+    if (defined(invoker.public_deps)) {
+      c_public_deps += invoker.public_deps
+    }
+    if (defined(invoker.deps)) {
+      c_deps += invoker.deps
     }
 
-    deps = []
-    foreach(d, rebased_mojo_sdk_deps) {
+    foreach(d, c_public_deps + rebased_mojo_sdk_public_deps) {
       # Resolve the name, so that a target //mojo/something becomes
       # //mojo/something:something and we can append "_c" to get the C
       # dependency name.
+      full_name = get_label_info(d, "label_no_toolchain")
+      public_deps += [ "${full_name}_c" ]
+    }
+    foreach(d, c_deps + rebased_mojo_sdk_deps) {
       full_name = get_label_info(d, "label_no_toolchain")
       deps += [ "${full_name}_c" ]
     }

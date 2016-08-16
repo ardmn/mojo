@@ -8,12 +8,12 @@
 #include <string>
 #include <vector>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/array.h"
 #include "mojo/public/cpp/bindings/string.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/interfaces/application/application.mojom.h"
 #include "mojo/public/interfaces/application/shell.mojom.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {

@@ -113,18 +113,19 @@ macro_rules! impl_encodable_for_interface {
             0 // Indicates that this type is inlined and it adds nothing external to the size
         }
         fn encode(self, encoder: &mut $crate::bindings::encoding::Encoder, context: $crate::bindings::encoding::Context) {
+            let version = self.version();
             let pos = encoder.add_handle(self.as_untyped());
             let mut state = encoder.get_mut(&context);
             state.encode(pos as i32);
-            state.encode(Self::version() as u32);
+            state.encode(version as u32);
         }
         fn decode(decoder: &mut $crate::bindings::decoding::Decoder, context: $crate::bindings::encoding::Context) -> Result<Self, ValidationError> {
-            let (handle_index, _version) = {
+            let (handle_index, version) = {
                 let mut state = decoder.get_mut(&context);
                 (state.decode::<i32>(), state.decode::<u32>())
             };
             let handle = try!(decoder.claim_handle::<$crate::system::message_pipe::MessageEndpoint>(handle_index));
-            Ok(Self::new(handle))
+            Ok(Self::with_version(handle, version))
         }
     }
 }

@@ -7,13 +7,13 @@
 
 #include <string>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/lib/connector.h"
 #include "mojo/public/cpp/bindings/lib/message_builder.h"
 #include "mojo/public/cpp/bindings/tests/message_queue.h"
 #include "mojo/public/cpp/environment/logging.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/cpp/utility/run_loop.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {

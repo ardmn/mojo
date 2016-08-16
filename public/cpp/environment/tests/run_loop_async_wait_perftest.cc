@@ -7,11 +7,11 @@
 
 #include <stdio.h>
 
+#include "gtest/gtest.h"
 #include "mojo/public/c/tests/environment/async_waiter_perftest_helpers.h"
 #include "mojo/public/cpp/environment/environment.h"
 #include "mojo/public/cpp/test_support/test_support.h"
 #include "mojo/public/cpp/utility/run_loop.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace {

@@ -12,7 +12,7 @@
 #include <mojo/system/handle.h>
 #include <mojo/system/wait.h>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 namespace {
 

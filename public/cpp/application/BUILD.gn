@@ -55,9 +55,7 @@ mojo_sdk_source_set("test_support") {
     ":application",
   ]
 
-  public_deps = [
-    "//third_party/gtest",
-  ]
+  mojo_sdk_public_deps = [ "mojo/public:gtest" ]
 
   mojo_sdk_deps = [
     "mojo/public/cpp/bindings",

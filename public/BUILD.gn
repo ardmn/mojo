@@ -27,17 +27,24 @@ group("sdk") {
     "cpp/utility",
     "interfaces/application",
     "interfaces/bindings",
+    "interfaces/network",
     "js",
   ]
-
-  if (mojo_use_network_in_sdk) {
-    deps += [ "interfaces/network" ]
-  }
 }
 
 static_library("libmojo_sdk") {
   complete_static_lib = true
   deps = [
     ":sdk",
+  ]
+}
+
+# "Forwarding" target, to make it easy to put gtest wherever you want.
+# TODO(vtl): Maybe this should be parametrized and made into
+# //build/module_args/mojo.gni (but maybe that's overkill).
+group("gtest") {
+  testonly = true
+  public_deps = [
+    "//third_party/gtest",
   ]
 }

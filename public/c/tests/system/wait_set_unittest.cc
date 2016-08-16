@@ -11,7 +11,7 @@
 #include <mojo/system/handle.h>
 #include <mojo/system/message_pipe.h>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 namespace {
 

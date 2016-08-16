@@ -11,11 +11,8 @@ mojo_sdk_source_set("tests") {
     "run_loop_unittest.cc",
   ]
 
-  deps = [
-    "//third_party/gtest",
-  ]
-
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/cpp/system",
     "mojo/public/cpp/test_support:test_utils",
     "mojo/public/cpp/utility",

@@ -9,6 +9,7 @@
 #include <utility>
 #include <vector>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/binding.h"
 #include "mojo/public/cpp/bindings/interface_ptr.h"
 #include "mojo/public/cpp/bindings/lib/connector.h"
@@ -23,7 +24,6 @@
 #include "mojo/public/cpp/test_support/test_support.h"
 #include "mojo/public/cpp/utility/run_loop.h"
 #include "mojo/public/interfaces/bindings/tests/validation_test_interfaces.mojom.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 

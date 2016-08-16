@@ -17,9 +17,9 @@
 
 #include <thread>
 
+#include "gtest/gtest.h"
 #include "mojo/public/c/tests/system/perftest_utils.h"
 #include "mojo/public/cpp/test_support/test_support.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace {
 

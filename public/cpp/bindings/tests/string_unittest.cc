@@ -4,8 +4,8 @@
 
 #include <sstream>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/string.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {

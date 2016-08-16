@@ -7,7 +7,7 @@
 
 #include <mojo/system/time.h>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 namespace {
 

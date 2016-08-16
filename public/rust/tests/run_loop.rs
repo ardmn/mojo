@@ -19,6 +19,9 @@ use mojo::bindings::run_loop::{RunLoop, Token, Handler, WaitError};
 use mojo::system::MOJO_INDEFINITE;
 use mojo::system::message_pipe;
 
+use std::cell::Cell;
+use std::rc::Rc;
+
 struct HandlerExpectReady {}
 
 impl Handler for HandlerExpectReady {
@@ -174,6 +177,63 @@ impl Handler for HandlerBadNesting {
     }
 }
 
+struct HandlerTasks {
+    count: Rc<Cell<u64>>,
+}
+
+impl Handler for HandlerTasks {
+    fn on_ready(&mut self, runloop: &mut RunLoop, token: Token) {
+        let r = self.count.clone();
+        let _ = runloop.post_task(move |_runloop| {
+            let val = (*r).get();
+            (*r).set(val+1);
+        }, 10);
+        if (*self.count).get() > 10 {
+            runloop.deregister(token);
+        }
+    }
+    fn on_timeout(&mut self, _runloop: &mut RunLoop, _token: Token) {
+        panic!("Timed-out when expected error");
+    }
+    fn on_error(&mut self, _runloop: &mut RunLoop, _token: Token, _error: WaitError) {
+        panic!("Error when expected ready");
+    }
+}
+
+struct NestedTasks {
+    count: Rc<Cell<u64>>,
+    quitter: bool,
+}
+
+impl Handler for NestedTasks {
+    fn on_ready(&mut self, runloop: &mut RunLoop, token: Token) {
+        let r = self.count.clone();
+        let quit = self.quitter;
+        let _ = runloop.post_task(move |runloop| {
+            let r2 = r.clone();
+            let tk = token.clone();
+            if (*r).get() < 10 {
+                let _ = runloop.post_task(move |_runloop| {
+                    let val = (*r2).get();
+                    (*r2).set(val+1);
+                }, 0);
+            } else {
+                if quit {
+                    runloop.quit();
+                } else {
+                    runloop.deregister(tk);
+                }
+            }
+        }, 0);
+    }
+    fn on_timeout(&mut self, _runloop: &mut RunLoop, _token: Token) {
+        panic!("Timed-out when expected error");
+    }
+    fn on_error(&mut self, _runloop: &mut RunLoop, _token: Token, _error: WaitError) {
+        panic!("Error when expected ready");
+    }
+}
+
 tests! {
     // Verifies that after adding and removing, we can run, exit and be
     // left in a consistent state.
@@ -277,6 +337,50 @@ tests! {
         run_loop::with_current(|runloop| {
             let _ = runloop.register(&endpt1, signals!(Signals::Readable), 0, HandlerBadNesting {});
             runloop.run();
+        });
+    }
+
+    // Tests adding a simple task that adds a handler.
+    fn simple_task() {
+        run_loop::with_current(|runloop| {
+            let _ = runloop.post_task(|runloop| {
+                let (_, endpt1) = message_pipe::create(mpflags!(Create::None)).unwrap();
+                let _ = runloop.register(&endpt1, signals!(Signals::Readable), 0, HandlerExpectError {});
+            }, 0);
+            runloop.run();
+        });
+    }
+
+    // Tests using a handler that adds a bunch of tasks.
+    fn handler_tasks() {
+        let (_endpt0, endpt1) = message_pipe::create(mpflags!(Create::None)).unwrap();
+        let r = Rc::new(Cell::new(0));
+        run_loop::with_current(|runloop| {
+            let _ = runloop.register(&endpt1, signals!(Signals::Writable), 0, HandlerTasks { count: r.clone() });
+            runloop.run();
+            assert!((*r).get() >= 11);
+        });
+    }
+
+    // Tests using a handler that adds a bunch of tasks.
+    fn nested_tasks() {
+        let (_endpt0, endpt1) = message_pipe::create(mpflags!(Create::None)).unwrap();
+        let r = Rc::new(Cell::new(0));
+        run_loop::with_current(|runloop| {
+            let _ = runloop.register(&endpt1, signals!(Signals::Writable), 0, NestedTasks { count: r.clone(), quitter: false });
+            runloop.run();
+            assert!((*r).get() >= 10);
+        });
+    }
+
+    // Tests using a handler that adds a bunch of tasks.
+    fn nested_tasks_quit() {
+        let (_endpt0, endpt1) = message_pipe::create(mpflags!(Create::None)).unwrap();
+        let r = Rc::new(Cell::new(0));
+        run_loop::with_current(|runloop| {
+            let _ = runloop.register(&endpt1, signals!(Signals::Writable), 0, NestedTasks { count: r.clone(), quitter: true });
+            runloop.run();
+            assert!((*r).get() >= 10);
         });
     }
 }

@@ -48,10 +48,10 @@ mojo_sdk_source_set("tests") {
   deps = [
     ":mojo_public_bindings_test_utils",
     ":validation_util",
-    "//third_party/gtest",
   ]
 
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/cpp/bindings",
     "mojo/public/cpp/bindings:callback",
     "mojo/public/cpp/environment:standalone",
@@ -71,11 +71,8 @@ mojo_sdk_source_set("perftests") {
     "bindings_perftest.cc",
   ]
 
-  deps = [
-    "//third_party/gtest",
-  ]
-
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/cpp/bindings",
     "mojo/public/cpp/bindings:callback",
     "mojo/public/cpp/environment:standalone",
@@ -104,11 +101,13 @@ mojo_sdk_source_set("validation_util") {
     "validation_util.h",
   ]
 
-  mojo_sdk_deps = [ "mojo/public/cpp/test_support" ]
-
   deps = [
     ":mojo_public_bindings_test_utils",
-    "//third_party/gtest",
+  ]
+
+  mojo_sdk_deps = [
+    "mojo/public:gtest",
+    "mojo/public/cpp/test_support",
   ]
 }
 

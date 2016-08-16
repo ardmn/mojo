@@ -6,10 +6,10 @@
 
 #include "mojo/public/cpp/system/data_pipe.h"
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/system/handle.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/cpp/system/wait.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace {

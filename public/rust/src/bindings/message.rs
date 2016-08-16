@@ -25,7 +25,7 @@ pub struct MessageHeader {
     pub version: u32,
     pub name: u32,
     pub flags: u32,
-    request_id: u64,
+    pub request_id: u64,
 }
 
 impl MessageHeader {
@@ -37,11 +37,6 @@ impl MessageHeader {
             flags: flags,
             request_id: 0,
         }
-    }
-
-    /// Set the request ID.
-    pub fn set_request_id(&mut self, id: u64) {
-        self.request_id = id;
     }
 }
 
@@ -65,7 +60,7 @@ impl MojomPointer for MessageHeader {
     fn encode_value(self, encoder: &mut Encoder, context: Context) {
         MojomEncodable::encode(self.name, encoder, context.clone());
         MojomEncodable::encode(self.flags, encoder, context.clone());
-        if self.flags != MESSAGE_HEADER_NO_FLAG {
+        if self.version > 0 {
             MojomEncodable::encode(self.request_id, encoder, context.clone());
         }
     }
@@ -112,3 +107,4 @@ impl MojomEncodable for MessageHeader {
 }
 
 impl MojomStruct for MessageHeader {}
+

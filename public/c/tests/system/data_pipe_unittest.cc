@@ -10,10 +10,9 @@
 #include <mojo/result.h>
 #include <mojo/system/handle.h>
 #include <mojo/system/wait.h>
-
 #include <string.h>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 namespace {
 

@@ -672,4 +672,34 @@ encoding_tests! {
             }
         }
     }
+    integration_intf_rqst_mthd0_good {
+        MessageHeader => {
+            |header: MessageHeader| {
+                assert_eq!(header.version, 1);
+                assert_eq!(header.name, 0);
+                assert_eq!(header.flags, 1);
+                assert_eq!(header.request_id, 7);
+            }
+        },
+        IntegrationTestInterfaceMethod0Request => {
+            |payload: &IntegrationTestInterfaceMethod0Request| {
+                assert_eq!(payload.param0.a, -1);
+            }
+        }
+    }
+    integration_intf_resp_mthd0_good {
+        MessageHeader => {
+            |header: MessageHeader| {
+                assert_eq!(header.version, 1);
+                assert_eq!(header.name, 0);
+                assert_eq!(header.flags, 2);
+                assert_eq!(header.request_id, 1);
+            }
+        },
+        IntegrationTestInterfaceMethod0Response => {
+            |payload: &IntegrationTestInterfaceMethod0Response| {
+                assert_eq!(payload.param0, vec![0]);
+            }
+        }
+    }
 }

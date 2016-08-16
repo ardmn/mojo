@@ -9,9 +9,9 @@
 #include <map>
 #include <utility>
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/system/buffer.h"
 #include "mojo/public/cpp/system/macros.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace {

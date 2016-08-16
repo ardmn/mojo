@@ -5,8 +5,8 @@
 // This provides a reference for comparison of performance versus overhead in
 // perftests.
 
+#include "gtest/gtest.h"
 #include "mojo/public/c/tests/system/perftest_utils.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace {
 

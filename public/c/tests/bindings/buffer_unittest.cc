@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 namespace {
 

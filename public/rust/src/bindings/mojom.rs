@@ -15,7 +15,7 @@ use std::panic;
 use std::ptr;
 use std::vec::Vec;
 
-use system::{CastHandle, Handle, UntypedHandle};
+use system::{MojoResult, CastHandle, Handle, UntypedHandle};
 use system::data_pipe;
 use system::message_pipe;
 use system::shared_buffer;
@@ -204,13 +204,23 @@ pub trait MojomInterface: MojomEncodable {
     fn service_name() -> &'static str;
 
     /// Get the version for this interface.
-    fn version() -> u32;
+    fn version(&self) -> u32;
 
     /// Access the underlying message pipe for this interface.
     fn pipe(&self) -> &message_pipe::MessageEndpoint;
 
     /// Unwrap the interface into its underlying message pipe.
     fn unwrap(self) -> message_pipe::MessageEndpoint;
+}
+
+/// An error that may occur when sending data over a Mojom interface.
+#[derive(Debug)]
+pub enum MojomSendError {
+    /// Failed to write to the underlying message pipe.
+    FailedWrite(MojoResult),
+
+    /// The version is too old to write the attempted message.
+    OldVersion(u32, u32),
 }
 
 /// Whatever implements this trait is considered to be a Mojom
@@ -220,11 +230,13 @@ pub trait MojomInterface: MojomEncodable {
 /// a tighter trait bound than MojomMessage that limits the types
 /// available for sending to those that are valid messages available
 /// to the interface.
+///
+/// TODO(mknyszek): Add sending control messages
 pub trait MojomInterfaceSend<R: MojomMessage>: MojomInterface {
     /// Creates a message.
-    fn create_request(&self, payload: R) -> (Vec<u8>, Vec<UntypedHandle>) {
-        let header = R::create_header();
-        // TODO(mknyszek): Calculate and set an actual request id
+    fn create_request(&self, req_id: u64, payload: R) -> (Vec<u8>, Vec<UntypedHandle>) {
+        let mut header = R::create_header();
+        header.request_id = req_id;
         let header_size = header.compute_size(Default::default());
         let size = header_size + payload.compute_size(Default::default());
         let mut buffer: Vec<u8> = Vec::with_capacity(size);
@@ -238,11 +250,28 @@ pub trait MojomInterfaceSend<R: MojomMessage>: MojomInterface {
         (buffer, handles)
     }
 
-    /// Creates and sends a message.
-    fn send_request(&self, payload: R) {
-        let (buffer, handles) = self.create_request(payload);
-        self.pipe().write(&buffer, handles, mpflags!(Write::None));
+    /// Creates and sends a message, and returns its request ID.
+    fn send_request(&self, req_id: u64, payload: R) -> Result<(), MojomSendError> {
+        if self.version() < R::min_version() {
+            return Err(MojomSendError::OldVersion(self.version(), R::min_version()));
+        }
+        let (buffer, handles) = self.create_request(req_id, payload);
+        match self.pipe().write(&buffer, handles, mpflags!(Write::None)) {
+            MojoResult::Okay => Ok(()),
+            err => Err(MojomSendError::FailedWrite(err)),
+        }
     }
+}
+
+/// An error that may occur when attempting to recieve a message over a
+/// Mojom interface.
+#[derive(Debug)]
+pub enum MojomRecvError {
+    /// Failed to read from the underlying message pipe.
+    FailedRead(MojoResult),
+
+    /// Failed to validate the buffer during decode.
+    FailedValidation(ValidationError),
 }
 
 /// Whatever implements this trait is considered to be a Mojom
@@ -252,14 +281,22 @@ pub trait MojomInterfaceSend<R: MojomMessage>: MojomInterface {
 /// which can contain any of the potential messages that may be recieved.
 /// This way, we can return that type and let the user multiplex over
 /// what message was received.
+///
+/// TODO(mknyszek): Add responding to control messages
 pub trait MojomInterfaceRecv: MojomInterface {
     type Container: MojomMessageOption;
 
     /// Tries to read a message from a pipe and decodes it.
-    fn recv_response(&self) -> Result<Self::Container, ValidationError> {
-        // TODO(mknyszek): Actually handle errors with reading
-        let (buffer, handles) = self.pipe().read(mpflags!(Read::None)).unwrap();
-        Self::Container::decode_message(buffer, handles)
+    fn recv_response(&self) -> Result<(u64, Self::Container), MojomRecvError> {
+        match self.pipe().read(mpflags!(Read::None)) {
+            Ok((buffer, handles)) => {
+                match Self::Container::decode_message(buffer, handles) {
+                    Ok((req_id, val)) => Ok((req_id, val)),
+                    Err(err) => Err(MojomRecvError::FailedValidation(err)),
+                }
+            },
+            Err(err) => Err(MojomRecvError::FailedRead(err)),
+        }
     }
 }
 
@@ -295,6 +332,7 @@ pub trait MojomStruct: MojomPointer {
 /// Marks a MojomStruct as being capable of being sent across some
 /// Mojom interface.
 pub trait MojomMessage: MojomStruct {
+    fn min_version() -> u32;
     fn create_header() -> MessageHeader;
 }
 
@@ -310,14 +348,13 @@ pub trait MojomMessageOption: Sized {
     fn decode_payload(header: MessageHeader, buffer: &[u8], handles: Vec<UntypedHandle>) -> Result<Self, ValidationError>;
 
     /// Decodes the message header and then the payload, returning a new
-    /// copy of itself.
-    fn decode_message(buffer: Vec<u8>, handles: Vec<UntypedHandle>) -> Result<Self, ValidationError> {
-        let header = match MessageHeader::deserialize(&buffer[..], Vec::new()) {
-            Ok(header) => header,
-            Err(err) => return Err(err),
-        };
+    /// copy of itself and the request ID found in the header.
+    fn decode_message(buffer: Vec<u8>, handles: Vec<UntypedHandle>) -> Result<(u64, Self), ValidationError> {
+        let header = try!(MessageHeader::deserialize(&buffer[..], Vec::new()));
         let payload_buffer = &buffer[header.serialized_size(&Default::default())..];
-        Self::decode_payload(header, payload_buffer, handles)
+        let req_id = header.request_id;
+        let ret = try!(Self::decode_payload(header, payload_buffer, handles));
+        Ok((req_id, ret))
     }
 }
 

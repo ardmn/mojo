@@ -10,12 +10,12 @@
 #include <mojo/bindings/internal/util.h>
 #include <string.h>
 
+#include "gtest/gtest.h"
 #include "mojo/public/c/tests/bindings/testing_util.h"
 #include "mojo/public/cpp/system/macros.h"
 #include "mojo/public/interfaces/bindings/tests/rect.mojom-c.h"
 #include "mojo/public/interfaces/bindings/tests/test_structs.mojom-c.h"
 #include "mojo/public/interfaces/bindings/tests/test_unions.mojom-c.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace {
 

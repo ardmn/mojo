@@ -74,10 +74,10 @@ mojo_sdk_source_set("bindings_unittests") {
 
   deps = [
     ":bindings",
-    "//third_party/gtest",
   ]
 
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/cpp/bindings/tests:mojo_public_bindings_test_utils",
     "mojo/public/cpp/bindings/tests:validation_util",
     "mojo/public/cpp/test_support",
@@ -114,8 +114,9 @@ mojo_sdk_source_set("common_unittests") {
 
   deps = [
     ":common",
-    "//third_party/gtest",
   ]
+
+  mojo_sdk_deps = [ "mojo/public:gtest" ]
 }
 
 # environment ------------------------------------------------------------------
@@ -298,8 +299,9 @@ mojo_sdk_source_set("system_unittests") {
 
   deps = [
     ":system",
-    "//third_party/gtest",
   ]
+
+  mojo_sdk_deps = [ "mojo/public:gtest" ]
 }
 
 mojo_sdk_source_set("system_perftests") {
@@ -315,10 +317,12 @@ mojo_sdk_source_set("system_perftests") {
 
   deps = [
     ":system",
-    "//third_party/gtest",
   ]
 
-  mojo_sdk_deps = [ "mojo/public/cpp/test_support" ]
+  mojo_sdk_deps = [
+    "mojo/public:gtest",
+    "mojo/public/cpp/test_support",
+  ]
 }
 
 # Compilation tests ------------------------------------------------------------
@@ -333,8 +337,9 @@ mojo_sdk_source_set("compile_unittests") {
 
   deps = [
     ":pure_compile_tests",
-    "//third_party/gtest",
   ]
+
+  mojo_sdk_deps = [ "mojo/public:gtest" ]
 }
 
 # This source set contains "pure" tests that only depend on the public SDK (and

@@ -94,8 +94,7 @@ template("mojo_sdk_source_set") {
           # The only deps that are not specified relative to the location of
           # the Mojo SDK should be on targets within the same file or on a
           # whitelisted set of external dependencies.
-          dep_dir = get_path_info(dep, "dir")
-          assert(dep_dir == "." || dep == "//third_party/gtest")
+          assert(get_path_info(dep, "dir") == ".")
         }
         public_deps += [ dep ]
       }
@@ -116,9 +115,8 @@ template("mojo_sdk_source_set") {
           # the Mojo SDK should be on targets within the same file or on a
           # whitelisted set of external dependencies.
           dep_dir = get_path_info(dep, "dir")
-          assert(dep_dir == "." || dep == "//third_party/gtest" ||
-                 (dep == "//dart/runtime:libdart" &&
-                  target_name == "mojo_internal_impl"))
+          assert(dep_dir == "." || (dep == "//dart/runtime:libdart" &&
+                                    target_name == "mojo_internal_impl"))
         }
         deps += [ dep ]
       }

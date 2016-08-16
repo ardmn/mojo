@@ -11,11 +11,8 @@ mojo_sdk_source_set("tests") {
     "service_provider_impl_unittest.cc",
   ]
 
-  deps = [
-    "//third_party/gtest",
-  ]
-
   mojo_sdk_deps = [
+    "mojo/public:gtest",
     "mojo/public/cpp/application:standalone",
     "mojo/public/cpp/bindings",
     "mojo/public/cpp/environment:standalone",

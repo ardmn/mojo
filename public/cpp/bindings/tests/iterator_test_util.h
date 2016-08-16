@@ -8,7 +8,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 namespace mojo {
 namespace test {

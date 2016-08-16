@@ -7,7 +7,7 @@
 // mojo/public/c/include/mojo/environment, mojo/public/c/include/mojo/system
 // (and the C standard library), and not using gtest.
 
-#include "third_party/gtest/include/gtest/gtest.h"
+#include "gtest/gtest.h"
 
 // Defined in compile_unittest_pure_c.c.
 extern "C" const char* MinimalCTest(void);

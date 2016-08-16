@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
+#include "gtest/gtest.h"
 #include "mojo/public/cpp/bindings/array.h"
 #include "mojo/public/cpp/bindings/lib/array_internal.h"
 #include "mojo/public/cpp/bindings/lib/array_serialization.h"
@@ -10,7 +11,6 @@
 #include "mojo/public/cpp/bindings/tests/iterator_test_util.h"
 #include "mojo/public/interfaces/bindings/tests/test_arrays.mojom.h"
 #include "mojo/public/interfaces/bindings/tests/test_structs.mojom.h"
-#include "third_party/gtest/include/gtest/gtest.h"
 
 namespace mojo {
 namespace test {
