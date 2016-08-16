@@ -1,4 +1,0 @@
-analyzer:
-  exclude:
-    - 'sdk_ext/**'
-    - '**/*.mojom.dart'
