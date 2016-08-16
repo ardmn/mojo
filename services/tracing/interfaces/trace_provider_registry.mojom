@@ -9,7 +9,7 @@
 [DartPackage="mojo_services"]
 module tracing;
 
-import "tracing/interfaces/tracing.mojom";
+import "mojo/services/tracing/interfaces/tracing.mojom";
 
 [ServiceName="tracing.TraceProviderRegistry"]
 interface TraceProviderRegistry {

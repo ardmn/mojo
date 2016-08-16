@@ -4,7 +4,7 @@
 
 module mojo.log;
 
-import "log/interfaces/entry.mojom";
+import "mojo/services/log/interfaces/entry.mojom";
 
 // An interface for logging.  e.g., to the system log service.
 [ServiceName="mojo::log::Log"]

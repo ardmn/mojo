@@ -4,8 +4,8 @@
 
 module mojo;
 
-import "gpu/interfaces/command_buffer.mojom";
-import "gpu/interfaces/viewport_parameter_listener.mojom";
+import "mojo/services/gpu/interfaces/command_buffer.mojom";
+import "mojo/services/gpu/interfaces/viewport_parameter_listener.mojom";
 
 // A ContextProvider can be used to provide new command buffers related to a
 // particular context, for instance configured to draw to a particular display.

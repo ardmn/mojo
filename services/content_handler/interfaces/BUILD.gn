@@ -9,8 +9,6 @@ mojom("interfaces") {
     "content_handler.mojom",
   ]
 
-  import_dirs = [ get_path_info("../../", "abspath") ]
-
   mojo_sdk_deps = [
     "mojo/public/interfaces/application",
     "mojo/public/interfaces/network",

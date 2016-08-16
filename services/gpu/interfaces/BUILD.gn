@@ -12,10 +12,4 @@ mojom("interfaces") {
     "gpu_capabilities.mojom",
     "viewport_parameter_listener.mojom",
   ]
-
-  import_dirs = [ get_path_info("../../", "abspath") ]
-
-  deps = [
-    "../../geometry/interfaces",
-  ]
 }

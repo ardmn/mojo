@@ -9,6 +9,4 @@ mojom("interfaces") {
     "trace_provider_registry.mojom",
     "tracing.mojom",
   ]
-
-  import_dirs = [ get_path_info("../../", "abspath") ]
 }

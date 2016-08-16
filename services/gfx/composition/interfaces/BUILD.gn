@@ -16,8 +16,6 @@ mojom("interfaces") {
     "scheduling.mojom",
   ]
 
-  import_dirs = [ get_path_info("../../../", "abspath") ]
-
   deps = [
     "../../../geometry/interfaces",
     "../../../gpu/interfaces",

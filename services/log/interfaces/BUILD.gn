@@ -9,6 +9,4 @@ mojom("interfaces") {
     "entry.mojom",
     "log.mojom",
   ]
-
-  import_dirs = [ get_path_info("../../", "abspath") ]
 }
