@@ -35,6 +35,7 @@ MojoResult MojoClose(MojoHandle handle) {
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     default:
@@ -48,7 +49,6 @@ MojoResult MojoDuplicateHandle(MojoHandle handle, MojoHandle* new_handle) {
   if (result < 0) {
     switch (result) {
       case ERR_BAD_HANDLE:
-        return MOJO_RESULT_INVALID_ARGUMENT;
       case ERR_INVALID_ARGS:
         return MOJO_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
@@ -172,6 +172,7 @@ MojoResult MojoWait(MojoHandle handle,
     // mx_handle_wait_one() currently return this.
     case ERR_NO_MEMORY:
       return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_TIMED_OUT:
@@ -212,6 +213,7 @@ MojoResult MojoWaitMany(const MojoHandle* handles,
       return MOJO_RESULT_CANCELLED;
     case ERR_NO_MEMORY:
       return MOJO_RESULT_RESOURCE_EXHAUSTED;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_TIMED_OUT:
@@ -269,6 +271,7 @@ MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
@@ -299,6 +302,7 @@ MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
@@ -478,8 +482,8 @@ MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
       (mx_handle_t)data_pipe_consumer_handle, 0u, *num_bytes, elements);
   if (bytes_read < 0) {
     switch (bytes_read) {
-      case ERR_INVALID_ARGS:
       case ERR_BAD_HANDLE:
+      case ERR_INVALID_ARGS:
         return MOJO_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
         return MOJO_RESULT_PERMISSION_DENIED;
@@ -516,8 +520,8 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
                               requested, (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
-      case ERR_INVALID_ARGS:
       case ERR_BAD_HANDLE:
+      case ERR_INVALID_ARGS:
         return MOJO_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
         return MOJO_RESULT_PERMISSION_DENIED;
@@ -599,6 +603,7 @@ MojoResult MojoGetBufferInformation(MojoHandle buffer_handle,
       info->flags = MOJO_BUFFER_INFORMATION_FLAG_NONE;
       info->num_bytes = num_bytes;
       return MOJO_RESULT_OK;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
@@ -626,6 +631,7 @@ MojoResult MojoMapBuffer(MojoHandle buffer_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
+    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
@@ -729,7 +735,6 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
     case ERR_NO_MEMORY:
       return MOJO_RESULT_RESOURCE_EXHAUSTED;
     case ERR_BAD_HANDLE:
-      return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
@@ -752,7 +757,6 @@ MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle, uint64_t cookie) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
-      return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
@@ -778,7 +782,6 @@ MojoResult MojoWaitSetWait(MojoHandle wait_set_handle,
     case ERR_NO_MEMORY:
       return MOJO_RESULT_RESOURCE_EXHAUSTED;
     case ERR_BAD_HANDLE:
-      return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_INVALID_ARGS:
       return MOJO_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
