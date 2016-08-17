@@ -11,7 +11,7 @@ namespace mojo {
 
 inline bool operator==(const Rect& lhs, const Rect& rhs) {
   return lhs.x == rhs.x && lhs.y == rhs.y && lhs.width == rhs.width &&
-         lhs.height == lhs.height;
+         lhs.height == rhs.height;
 }
 
 inline bool operator!=(const Rect& lhs, const Rect& rhs) {
