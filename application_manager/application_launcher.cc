@@ -94,12 +94,8 @@ mtl::UniqueHandle LaunchWithProcess(
   // process to print out load addresses so we can understand crashes.
   mx_handle_t result = launchpad_launch_mxio_etc(
       path_arg, 1, &path_arg, environ, 1, &request_handle, &request_id);
-  if (result < 0) {
-    // launchpad_launch is inconsistent about whether it closes this handles
-    // for us.  See MG-239.
-    mx_handle_close(request_handle);
+  if (result < 0)
     return mtl::UniqueHandle();
-  }
   return mtl::UniqueHandle(result);
 }
 
