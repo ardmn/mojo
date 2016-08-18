@@ -115,6 +115,12 @@ mojo_public_test("mojo_public_cpp_utility_unittests") {
   ]
 }
 
+mojo_public_test("mojo_services_geometry_cpp_unittests") {
+  deps = [
+    "//mojo/services/geometry/cpp/tests"
+  ]
+}
+
 # C perf tests:
 
 mojo_public_test("mojo_public_c_system_perftests") {
