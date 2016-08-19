@@ -16,6 +16,7 @@ group("test") {
     ":mojo_public_cpp_environment_unittests",
     ":mojo_public_cpp_system_unittests",
     ":mojo_public_cpp_utility_unittests",
+    ":mojo_services_geometry_cpp_unittests",
 
     # Perf tests:
     ":mojo_public_c_system_perftests",
@@ -115,6 +116,7 @@ mojo_public_test("mojo_public_cpp_utility_unittests") {
   ]
 }
 
+# TODO(vtl): This should probably be moved elsewhere.
 mojo_public_test("mojo_services_geometry_cpp_unittests") {
   deps = [
     "//mojo/services/geometry/cpp/tests"
