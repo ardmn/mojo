@@ -8,6 +8,7 @@
 #include <mojo/system/data_pipe.h>
 #include <mojo/system/handle.h>
 #include <mojo/system/message_pipe.h>
+#include <mojo/system/result.h>
 #include <mojo/system/wait.h>
 #include <mojo/system/wait_set.h>
 #include <stddef.h>
@@ -37,9 +38,9 @@ MojoResult MojoClose(MojoHandle handle) {
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -50,13 +51,13 @@ MojoResult MojoDuplicateHandle(MojoHandle handle, MojoHandle* new_handle) {
     switch (result) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *new_handle = (MojoHandle)result;
@@ -71,16 +72,16 @@ MojoResult MojoGetRights(MojoHandle handle, MojoHandleRights* rights) {
   if (result < 0) {
     switch (result) {
       case ERR_BUSY:
-        return MOJO_RESULT_BUSY;
+        return MOJO_SYSTEM_RESULT_BUSY;
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *rights = handle_info.rights;
@@ -117,16 +118,16 @@ MojoResult MojoDuplicateHandleWithReducedRights(
   if (new_mx_handle < 0) {
     switch (new_mx_handle) {
       case ERR_BUSY:
-        return MOJO_RESULT_BUSY;
+        return MOJO_SYSTEM_RESULT_BUSY;
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *new_handle = (MojoHandle)new_mx_handle;
@@ -167,27 +168,27 @@ MojoResult MojoWait(MojoHandle handle,
     case NO_ERROR:
       return MOJO_RESULT_OK;
     case ERR_CANCELLED:
-      return MOJO_RESULT_CANCELLED;
+      return MOJO_SYSTEM_RESULT_CANCELLED;
     // TODO(vtl): This is currently not specified for MojoWait(), nor does
     // mx_handle_wait_one() currently return this.
     case ERR_NO_MEMORY:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_TIMED_OUT:
-      return MOJO_RESULT_DEADLINE_EXCEEDED;
+      return MOJO_SYSTEM_RESULT_DEADLINE_EXCEEDED;
     case ERR_BAD_STATE:
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     // TODO(vtl): mx_handle_wait_one() currently never returns this.
     case ERR_BUSY:
-      return MOJO_RESULT_BUSY;
+      return MOJO_SYSTEM_RESULT_BUSY;
     // TODO(vtl): The Mojo version doesn't require any rights to wait, whereas
     // Magenta requires MX_RIGHT_READ.
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -210,25 +211,25 @@ MojoResult MojoWaitMany(const MojoHandle* handles,
     case NO_ERROR:
       return MOJO_RESULT_OK;
     case ERR_CANCELLED:
-      return MOJO_RESULT_CANCELLED;
+      return MOJO_SYSTEM_RESULT_CANCELLED;
     case ERR_NO_MEMORY:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_TIMED_OUT:
-      return MOJO_RESULT_DEADLINE_EXCEEDED;
+      return MOJO_SYSTEM_RESULT_DEADLINE_EXCEEDED;
     case ERR_BAD_STATE:
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     // TODO(vtl): mx_handle_wait_many() currently never returns this.
     case ERR_BUSY:
-      return MOJO_RESULT_BUSY;
+      return MOJO_SYSTEM_RESULT_BUSY;
     // TODO(vtl): The Mojo version doesn't require any rights to wait, whereas
     // Magenta requires MX_RIGHT_READ.
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -239,17 +240,17 @@ MojoResult MojoCreateMessagePipe(
     MojoHandle* message_pipe_handle0,
     MojoHandle* message_pipe_handle1) {
   if (options && options->flags != MOJO_CREATE_MESSAGE_PIPE_OPTIONS_FLAG_NONE)
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t mx_handles[2];
   mx_status_t status = mx_message_pipe_create(mx_handles, 0);
   if (status != NO_ERROR) {
     switch (status) {
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *message_pipe_handle0 = (MojoHandle)mx_handles[0];
@@ -273,18 +274,18 @@ MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
       // Notice the different semantics than mx_message_read.
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NO_MEMORY:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     case ERR_TOO_BIG:
     // TODO(abarth): Handle messages that are too big to fit.
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -304,21 +305,21 @@ MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
       // Notice the different semantics than mx_message_write.
-      return MOJO_RESULT_SHOULD_WAIT;
+      return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
     case ERR_CHANNEL_CLOSED:
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NO_MEMORY:
       // Notice the collision with ERR_NOT_ENOUGH_BUFFER.
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     case ERR_NOT_ENOUGH_BUFFER:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -332,7 +333,7 @@ MojoResult MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
   if (options) {
     if (options->flags) {
       // TODO: Support flags
-      return MOJO_RESULT_UNIMPLEMENTED;
+      return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
     }
     element_num_bytes = options->element_num_bytes;
     if (options->capacity_num_bytes)
@@ -345,11 +346,11 @@ MojoResult MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
   if (mx_producer_handle < 0) {
     switch (mx_producer_handle) {
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *data_pipe_producer_handle = (MojoHandle)mx_producer_handle;
@@ -360,14 +361,14 @@ MojoResult MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
 MojoResult MojoSetDataPipeProducerOptions(
     MojoHandle data_pipe_producer_handle,
     const struct MojoDataPipeProducerOptions* options) {
-  return MOJO_RESULT_UNIMPLEMENTED;
+  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
 MojoResult MojoGetDataPipeProducerOptions(
     MojoHandle data_pipe_producer_handle,
     struct MojoDataPipeProducerOptions* options,
     uint32_t options_num_bytes) {
-  return MOJO_RESULT_UNIMPLEMENTED;
+  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
 MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
@@ -376,7 +377,7 @@ MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
                          MojoWriteDataFlags flags) {
   if (flags) {
     // TODO: Support flags
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
   mx_ssize_t mx_bytes_written =
       mx_data_pipe_write((mx_handle_t)data_pipe_producer_handle,
@@ -386,15 +387,15 @@ MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
     switch (mx_bytes_written) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
-        return MOJO_RESULT_FAILED_PRECONDITION;
+        return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
       case ERR_NOT_READY:
-        return MOJO_RESULT_SHOULD_WAIT;
+        return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *num_bytes = mx_bytes_written;
@@ -407,7 +408,7 @@ MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
                               MojoWriteDataFlags flags) {
   if (flags) {
     // TODO: Support flags
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
   // TODO(abarth): MojoBeginWriteData doesn't have a way to limit the amount of
   // virtual memory that it will map.
@@ -421,15 +422,15 @@ MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
     switch (result) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
-        return MOJO_RESULT_FAILED_PRECONDITION;
+        return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
       case ERR_NOT_READY:
-        return MOJO_RESULT_SHOULD_WAIT;
+        return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *buffer_num_bytes = (uint32_t)result;
@@ -445,29 +446,29 @@ MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NOT_READY:
-      return MOJO_RESULT_SHOULD_WAIT;
+      return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
     default:
-      return MOJO_RESULT_INTERNAL;
+      return MOJO_SYSTEM_RESULT_INTERNAL;
   }
 }
 
 MojoResult MojoSetDataPipeConsumerOptions(
     MojoHandle data_pipe_consumer_handle,
     const struct MojoDataPipeConsumerOptions* options) {
-  return MOJO_RESULT_UNIMPLEMENTED;
+  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
 MojoResult MojoGetDataPipeConsumerOptions(
     MojoHandle data_pipe_consumer_handle,
     struct MojoDataPipeConsumerOptions* options,
     uint32_t options_num_bytes) {
-  return MOJO_RESULT_UNIMPLEMENTED;
+  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
 MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
@@ -476,7 +477,7 @@ MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
                         MojoReadDataFlags flags) {
   if (flags) {
     // TODO: Support flags
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
   mx_ssize_t bytes_read = mx_data_pipe_read(
       (mx_handle_t)data_pipe_consumer_handle, 0u, *num_bytes, elements);
@@ -484,19 +485,19 @@ MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
     switch (bytes_read) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
-        return MOJO_RESULT_FAILED_PRECONDITION;
+        return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
       case ERR_NOT_READY:
-        return MOJO_RESULT_SHOULD_WAIT;
+        return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
-        return MOJO_RESULT_INTERNAL;
+        return MOJO_SYSTEM_RESULT_INTERNAL;
     }
   }
   if (bytes_read < 0) {
-    return MOJO_RESULT_UNKNOWN;
+    return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
   *num_bytes = bytes_read;
   return MOJO_RESULT_OK;
@@ -508,7 +509,7 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
                              MojoReadDataFlags flags) {
   if (flags) {
     // TODO: Support flags
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
   // TODO(abarth): MojoBeginReadData doesn't have a way to limit the amount of
   // virtual memory that it will map.
@@ -522,15 +523,15 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
     switch (result) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
-        return MOJO_RESULT_PERMISSION_DENIED;
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
-        return MOJO_RESULT_FAILED_PRECONDITION;
+        return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
       case ERR_NOT_READY:
-        return MOJO_RESULT_SHOULD_WAIT;
+        return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
-        return MOJO_RESULT_INTERNAL;
+        return MOJO_SYSTEM_RESULT_INTERNAL;
     }
   }
   *buffer_num_bytes = (uint32_t)result;
@@ -546,13 +547,13 @@ MojoResult MojoEndReadData(MojoHandle data_pipe_consumer_handle,
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
-      return MOJO_RESULT_FAILED_PRECONDITION;
+      return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     default:
-      return MOJO_RESULT_INTERNAL;
+      return MOJO_SYSTEM_RESULT_INTERNAL;
   }
 }
 
@@ -563,16 +564,16 @@ MojoResult MojoCreateSharedBuffer(
     uint64_t num_bytes,
     MojoHandle* shared_buffer_handle) {
   if (options && options->flags != MOJO_CREATE_SHARED_BUFFER_OPTIONS_FLAG_NONE)
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   mx_handle_t result = mx_vm_object_create(num_bytes);
   if (result < 0) {
     switch (result) {
       case ERR_INVALID_ARGS:
-        return MOJO_RESULT_INVALID_ARGUMENT;
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *shared_buffer_handle = (MojoHandle)result;
@@ -585,7 +586,7 @@ MojoResult MojoDuplicateBufferHandle(
     MojoHandle* new_buffer_handle) {
   if (options &&
       options->flags != MOJO_DUPLICATE_BUFFER_HANDLE_OPTIONS_FLAG_NONE)
-    return MOJO_RESULT_UNIMPLEMENTED;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   return MojoDuplicateHandle(buffer_handle, new_buffer_handle);
 }
 
@@ -593,7 +594,7 @@ MojoResult MojoGetBufferInformation(MojoHandle buffer_handle,
                                     struct MojoBufferInformation* info,
                                     uint32_t info_num_bytes) {
   if (!info || info_num_bytes < 16)
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t vmo_handle = (mx_handle_t)buffer_handle;
   uint64_t num_bytes = 0;
   mx_status_t status = mx_vm_object_get_size(vmo_handle, &num_bytes);
@@ -605,11 +606,11 @@ MojoResult MojoGetBufferInformation(MojoHandle buffer_handle,
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -619,7 +620,7 @@ MojoResult MojoMapBuffer(MojoHandle buffer_handle,
                          void** buffer,
                          MojoMapBufferFlags flags) {
   if (flags != MOJO_MAP_BUFFER_FLAG_NONE)
-    return MOJO_RESULT_INVALID_ARGUMENT;
+    return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t vmo_handle = (mx_handle_t)buffer_handle;
   uintptr_t* mx_pointer = (uintptr_t*)buffer;
   // TODO(abarth): Mojo doesn't let you specify any flags. It's unclear whether
@@ -633,13 +634,13 @@ MojoResult MojoMapBuffer(MojoHandle buffer_handle,
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_NO_MEMORY:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -653,9 +654,9 @@ MojoResult MojoUnmapBuffer(void* buffer) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -688,12 +689,12 @@ MojoResult MojoCreateWaitSet(const struct MojoCreateWaitSetOptions* options,
   if (options) {
     if (options->struct_size <
         EXTENT_OF(struct MojoCreateWaitSetOptions, struct_size))
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     if (options->struct_size >=
         EXTENT_OF(struct MojoCreateWaitSetOptions, flags)) {
       // Currently no known flags.
       if (options->flags)
-        return MOJO_RESULT_UNIMPLEMENTED;
+        return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
     }
   }
 
@@ -701,9 +702,9 @@ MojoResult MojoCreateWaitSet(const struct MojoCreateWaitSetOptions* options,
   if (result < 0) {
     switch (result) {
       case ERR_NO_MEMORY:
-        return MOJO_RESULT_RESOURCE_EXHAUSTED;
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
       default:
-        return MOJO_RESULT_UNKNOWN;
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
   *handle = (MojoHandle)result;
@@ -718,12 +719,12 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
   if (options) {
     if (options->struct_size <
         EXTENT_OF(struct MojoWaitSetAddOptions, struct_size))
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     if (options->struct_size >=
         EXTENT_OF(struct MojoWaitSetAddOptions, flags)) {
       // Currently no known flags.
       if (options->flags)
-        return MOJO_RESULT_UNIMPLEMENTED;
+        return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
     }
   }
 
@@ -733,21 +734,21 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
     case NO_ERROR:
       return MOJO_RESULT_OK;
     case ERR_NO_MEMORY:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_NOT_SUPPORTED:
       // TODO(vtl): |mx_wait_set_add()| returns this is |handle| is not
       // waitable. There's currently no Mojo/EDK equivalent. Maybe this should
-      // be |MOJO_RESULT_UNIMPLEMENTED| instead?
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      // be |MOJO_SYSTEM_RESULT_UNIMPLEMENTED| instead?
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ALREADY_EXISTS:
-      return MOJO_RESULT_ALREADY_EXISTS;
+      return MOJO_SYSTEM_RESULT_ALREADY_EXISTS;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -758,13 +759,13 @@ MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle, uint64_t cookie) {
       return MOJO_RESULT_OK;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_NOT_FOUND:
-      return MOJO_RESULT_NOT_FOUND;
+      return MOJO_SYSTEM_RESULT_NOT_FOUND;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
 
@@ -780,15 +781,15 @@ MojoResult MojoWaitSetWait(MojoHandle wait_set_handle,
     case NO_ERROR:
       return MOJO_RESULT_OK;
     case ERR_NO_MEMORY:
-      return MOJO_RESULT_RESOURCE_EXHAUSTED;
+      return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
-      return MOJO_RESULT_INVALID_ARGUMENT;
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
-      return MOJO_RESULT_PERMISSION_DENIED;
+      return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_TIMED_OUT:
-      return MOJO_RESULT_DEADLINE_EXCEEDED;
+      return MOJO_SYSTEM_RESULT_DEADLINE_EXCEEDED;
     default:
-      return MOJO_RESULT_UNKNOWN;
+      return MOJO_SYSTEM_RESULT_UNKNOWN;
   }
 }
