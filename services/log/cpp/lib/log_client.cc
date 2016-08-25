@@ -5,11 +5,12 @@
 #include "mojo/services/log/cpp/log_client.h"
 
 #include <assert.h>
+#include <mojo/environment/logger.h>
+#include <mojo/system/result.h>
 
 #include <string>
 #include <utility>
 
-#include "mojo/public/c/environment/logger.h"
 #include "mojo/public/cpp/bindings/interface_handle.h"
 #include "mojo/public/cpp/bindings/lib/message_builder.h"
 #include "mojo/public/cpp/system/macros.h"
@@ -102,12 +103,13 @@ void LogClient::LogMessage(MojoLogLevel log_level,
       break;
 
     // TODO(vardhan): Are any of these error cases recoverable (in which case
-    // we shouldn't close our handle)?  Maybe MOJO_RESULT_RESOURCE_EXHAUSTED?
-    case MOJO_RESULT_INVALID_ARGUMENT:
-    case MOJO_RESULT_RESOURCE_EXHAUSTED:
-    case MOJO_RESULT_FAILED_PRECONDITION:
-    case MOJO_RESULT_UNIMPLEMENTED:
-    case MOJO_RESULT_BUSY: {
+    // we shouldn't close our handle)?  Maybe
+    // MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED?
+    case MOJO_SYSTEM_RESULT_INVALID_ARGUMENT:
+    case MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED:
+    case MOJO_SYSTEM_RESULT_FAILED_PRECONDITION:
+    case MOJO_SYSTEM_RESULT_UNIMPLEMENTED:
+    case MOJO_SYSTEM_RESULT_BUSY: {
       return fallback_logger_->LogMessage(log_level, source_file, source_line,
                                           message);
     }
