@@ -10,8 +10,12 @@ source_set("impl") {
   deps = [
     "//mojo/public/c:system",
   ]
+  libs = [ "magenta" ]
 
-  cflags = [ "-Werror", "-Wsign-conversion" ]
+  cflags = [
+    "-Werror",
+    "-Wsign-conversion",
+  ]
 }
 
 static_library("system") {
