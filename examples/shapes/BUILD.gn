@@ -14,6 +14,8 @@ executable("shapes") {
     "//third_party/skia",
   ]
 
+  libs = [ "magenta" ]
+
   sources = [
     "shapes.cc",
   ]

@@ -28,7 +28,7 @@ executable("application_manager") {
     "//mojo/public/interfaces/application",
     "//mojo/public/interfaces/network",
     "//mojo/services/content_handler/interfaces",
-    "//mojo/system:impl",
+    "//mojo/system:libmojo",
   ]
 
   libs = [

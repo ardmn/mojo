@@ -2,7 +2,8 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 
-source_set("impl") {
+shared_library("libmojo") {
+  output_name = "mojo"
   sources = [
     "mojo.c",
   ]
@@ -10,6 +11,7 @@ source_set("impl") {
   deps = [
     "//mojo/public/c:system",
   ]
+
   libs = [ "magenta" ]
 
   cflags = [
@@ -26,7 +28,7 @@ static_library("system") {
   ]
 
   deps = [
-    ":impl",
+    ":libmojo",
     "//mojo/public/c:system",
   ]
 }
