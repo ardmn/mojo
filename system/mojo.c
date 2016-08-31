@@ -268,7 +268,7 @@ MojoResult MojoCreateMessagePipe(
   if (options && options->flags != MOJO_CREATE_MESSAGE_PIPE_OPTIONS_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t mx_handles[2];
-  mx_status_t status = mx_message_pipe_create(mx_handles, 0);
+  mx_status_t status = mx_msgpipe_create(mx_handles, 0);
   if (status != NO_ERROR) {
     switch (status) {
       case ERR_INVALID_ARGS:
@@ -293,7 +293,7 @@ MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
   mx_handle_t* mx_handles = (mx_handle_t*)handles;
   // TODO(abarth): Handle messages that are too big to fit.
   mx_status_t status =
-      mx_message_write((mx_handle_t)message_pipe_handle, bytes, num_bytes,
+      mx_msgpipe_write((mx_handle_t)message_pipe_handle, bytes, num_bytes,
                        mx_handles, num_handles, flags);
   switch (status) {
     case NO_ERROR:
@@ -304,7 +304,7 @@ MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
-      // Notice the different semantics than mx_message_read.
+      // Notice the different semantics than mx_msgpipe_read.
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NO_MEMORY:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
@@ -324,7 +324,7 @@ MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
   mx_handle_t* mx_handles = (mx_handle_t*)handles;
   // TODO(abarth): Handle messages that were too big to fit.
   mx_status_t status =
-      mx_message_read((mx_handle_t)message_pipe_handle, bytes, num_bytes,
+      mx_msgpipe_read((mx_handle_t)message_pipe_handle, bytes, num_bytes,
                       mx_handles, num_handles, flags);
   switch (status) {
     case NO_ERROR:
@@ -335,7 +335,7 @@ MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
-      // Notice the different semantics than mx_message_write.
+      // Notice the different semantics than mx_msgpipe_write.
       return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
     case ERR_REMOTE_CLOSED:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
@@ -366,7 +366,7 @@ MojoResult MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
       capacity_num_bytes = options->capacity_num_bytes;
   }
   mx_handle_t mx_consumer_handle = 0u;
-  mx_handle_t mx_producer_handle = mx_data_pipe_create(
+  mx_handle_t mx_producer_handle = mx_datapipe_create(
       0u,  // TODO: Flags
       element_num_bytes, capacity_num_bytes, &mx_consumer_handle);
   if (mx_producer_handle < 0) {
@@ -406,9 +406,9 @@ MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
   mx_ssize_t mx_bytes_written =
-      mx_data_pipe_write((mx_handle_t)data_pipe_producer_handle,
-                         0u,  // TODO: flags
-                         *num_bytes, elements);
+      mx_datapipe_write((mx_handle_t)data_pipe_producer_handle,
+                        0u,  // TODO: flags
+                        *num_bytes, elements);
   if (mx_bytes_written < 0) {
     switch (mx_bytes_written) {
       case ERR_BAD_HANDLE:
@@ -436,14 +436,10 @@ MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
-  // TODO(abarth): MojoBeginWriteData doesn't have a way to limit the amount of
-  // virtual memory that it will map.
-  // See https://github.com/domokit/mojo/issues/812
-  mx_size_t requested = UINTPTR_MAX;
   mx_ssize_t result =
-      mx_data_pipe_begin_write((mx_handle_t)data_pipe_producer_handle,
-                               0u,  // TODO: flags
-                               requested, (uintptr_t*)buffer);
+      mx_datapipe_begin_write((mx_handle_t)data_pipe_producer_handle,
+                              0u,  // TODO: flags
+                              (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
       case ERR_BAD_HANDLE:
@@ -465,7 +461,7 @@ MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
 
 MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
                             uint32_t num_bytes_written) {
-  mx_status_t result = mx_data_pipe_end_write(
+  mx_status_t result = mx_datapipe_end_write(
       (mx_handle_t)data_pipe_producer_handle, num_bytes_written);
   switch (result) {
     case NO_ERROR:
@@ -505,7 +501,7 @@ MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
-  mx_ssize_t bytes_read = mx_data_pipe_read(
+  mx_ssize_t bytes_read = mx_datapipe_read(
       (mx_handle_t)data_pipe_consumer_handle, 0u, *num_bytes, elements);
   if (bytes_read < 0) {
     switch (bytes_read) {
@@ -537,14 +533,10 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   }
-  // TODO(abarth): MojoBeginReadData doesn't have a way to limit the amount of
-  // virtual memory that it will map.
-  // See https://github.com/domokit/mojo/issues/812
-  mx_size_t requested = UINTPTR_MAX;
   mx_ssize_t result =
-      mx_data_pipe_begin_read((mx_handle_t)data_pipe_consumer_handle,
-                              0u,  // TODO: flags
-                              requested, (uintptr_t*)buffer);
+      mx_datapipe_begin_read((mx_handle_t)data_pipe_consumer_handle,
+                             0u,  // TODO: flags
+                             (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
       case ERR_BAD_HANDLE:
@@ -566,7 +558,7 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
 
 MojoResult MojoEndReadData(MojoHandle data_pipe_consumer_handle,
                            uint32_t num_bytes_read) {
-  mx_status_t result = mx_data_pipe_end_read(
+  mx_status_t result = mx_datapipe_end_read(
       (mx_handle_t)data_pipe_consumer_handle, num_bytes_read);
   switch (result) {
     case NO_ERROR:
@@ -591,7 +583,7 @@ MojoResult MojoCreateSharedBuffer(
     MojoHandle* shared_buffer_handle) {
   if (options && options->flags != MOJO_CREATE_SHARED_BUFFER_OPTIONS_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-  mx_handle_t result = mx_vm_object_create(num_bytes);
+  mx_handle_t result = mx_vmo_create(num_bytes);
   if (result < 0) {
     switch (result) {
       case ERR_INVALID_ARGS:
@@ -623,7 +615,7 @@ MojoResult MojoGetBufferInformation(MojoHandle buffer_handle,
     return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t vmo_handle = (mx_handle_t)buffer_handle;
   uint64_t num_bytes = 0;
-  mx_status_t status = mx_vm_object_get_size(vmo_handle, &num_bytes);
+  mx_status_t status = mx_vmo_get_size(vmo_handle, &num_bytes);
   switch (status) {
     case NO_ERROR:
       info->struct_size = sizeof(struct MojoBufferInformation);
@@ -654,7 +646,7 @@ MojoResult MojoMapBuffer(MojoHandle buffer_handle,
   uint32_t mx_flags = MX_VM_FLAG_PERM_READ | MX_VM_FLAG_PERM_WRITE;
 
   mx_status_t status =
-      mx_process_vm_map(0, vmo_handle, offset, num_bytes, mx_pointer, mx_flags);
+      mx_process_map_vm(0, vmo_handle, offset, num_bytes, mx_pointer, mx_flags);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
@@ -672,10 +664,10 @@ MojoResult MojoMapBuffer(MojoHandle buffer_handle,
 
 MojoResult MojoUnmapBuffer(void* buffer) {
   uintptr_t address = (uintptr_t)buffer;
-  // TODO(abarth): mx_process_vm_unmap needs the length to unmap, but Mojo
+  // TODO(abarth): mx_process_unmap_vm needs the length to unmap, but Mojo
   // doesn't give us the length.
   mx_size_t length = 0;
-  mx_status_t status = mx_process_vm_unmap(0, address, length);
+  mx_status_t status = mx_process_unmap_vm(0, address, length);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
@@ -688,19 +680,19 @@ MojoResult MojoUnmapBuffer(void* buffer) {
 
 // wait_set.h ------------------------------------------------------------------
 
-static_assert(sizeof(struct MojoWaitSetResult) == sizeof(mx_wait_set_result_t),
+static_assert(sizeof(struct MojoWaitSetResult) == sizeof(mx_waitset_result_t),
               "Wait set result types must match");
 static_assert(offsetof(struct MojoWaitSetResult, cookie) ==
-                  offsetof(mx_wait_set_result_t, cookie),
+                  offsetof(mx_waitset_result_t, cookie),
               "Wait set result types must match");
 static_assert(offsetof(struct MojoWaitSetResult, wait_result) ==
-                  offsetof(mx_wait_set_result_t, wait_result),
+                  offsetof(mx_waitset_result_t, wait_result),
               "Wait set result types must match");
 static_assert(offsetof(struct MojoWaitSetResult, reserved) ==
-                  offsetof(mx_wait_set_result_t, reserved),
+                  offsetof(mx_waitset_result_t, reserved),
               "Wait set result types must match");
 static_assert(offsetof(struct MojoWaitSetResult, signals_state) ==
-                  offsetof(mx_wait_set_result_t, signals_state),
+                  offsetof(mx_waitset_result_t, signals_state),
               "Wait set result types must match");
 
 // Like |offsetof()|, but includes that data itself.
@@ -724,7 +716,7 @@ MojoResult MojoCreateWaitSet(const struct MojoCreateWaitSetOptions* options,
     }
   }
 
-  mx_status_t result = mx_wait_set_create();
+  mx_status_t result = mx_waitset_create();
   if (result < 0) {
     switch (result) {
       case ERR_NO_MEMORY:
@@ -754,8 +746,8 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
     }
   }
 
-  mx_status_t status = mx_wait_set_add((mx_handle_t)wait_set_handle,
-                                       (mx_handle_t)handle, signals, cookie);
+  mx_status_t status = mx_waitset_add((mx_handle_t)wait_set_handle,
+                                      (mx_handle_t)handle, signals, cookie);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
@@ -767,7 +759,7 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_NOT_SUPPORTED:
-      // TODO(vtl): |mx_wait_set_add()| returns this is |handle| is not
+      // TODO(vtl): |mx_waitset_add()| returns this is |handle| is not
       // waitable. There's currently no Mojo/EDK equivalent. Maybe this should
       // be |MOJO_SYSTEM_RESULT_UNIMPLEMENTED| instead?
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -779,7 +771,7 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
 }
 
 MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle, uint64_t cookie) {
-  mx_status_t status = mx_wait_set_remove((mx_handle_t)wait_set_handle, cookie);
+  mx_status_t status = mx_waitset_remove((mx_handle_t)wait_set_handle, cookie);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
@@ -800,9 +792,9 @@ MojoResult MojoWaitSetWait(MojoHandle wait_set_handle,
                            uint32_t* num_results,
                            struct MojoWaitSetResult* results,
                            uint32_t* max_results) {
-  mx_status_t status = mx_wait_set_wait(
+  mx_status_t status = mx_waitset_wait(
       (mx_handle_t)wait_set_handle, MojoDeadlineToTime(deadline), num_results,
-      (mx_wait_set_result_t*)results, max_results);
+      (mx_waitset_result_t*)results, max_results);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
