@@ -337,7 +337,7 @@ MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
     case ERR_BAD_STATE:
       // Notice the different semantics than mx_message_write.
       return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
-    case ERR_CHANNEL_CLOSED:
+    case ERR_REMOTE_CLOSED:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NO_MEMORY:
       // Notice the collision with ERR_NOT_ENOUGH_BUFFER.
