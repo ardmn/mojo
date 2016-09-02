@@ -7,13 +7,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "lib/ftl/command_line.h"
 #include "lib/ftl/logging.h"
 #include "mojo/application_manager/application_instance.h"
 #include "mojo/application_manager/shell_impl.h"
 
 namespace mojo {
 
-ApplicationManager::ApplicationManager() {}
+ApplicationManager::ApplicationManager(
+    std::unordered_map<std::string, std::vector<std::string>>&& args_for)
+    : args_for_(args_for) {}
 
 ApplicationManager::~ApplicationManager() {}
 
@@ -23,25 +26,21 @@ bool ApplicationManager::StartInitialApplication(std::string name) {
 }
 
 void ApplicationManager::ConnectToApplication(
-    const std::string& application_name,
-    const std::string& requestor_name,
+    const std::string& application_name, const std::string& requestor_name,
     InterfaceRequest<ServiceProvider> services) {
   ApplicationInstance* instance =
       GetOrStartApplicationInstance(std::move(application_name));
-  if (!instance)
-    return;
+  if (!instance) return;
   instance->application()->AcceptConnection(requestor_name, requestor_name,
                                             std::move(services));
 }
 
 void ApplicationManager::StartApplicationUsingContentHandler(
-    const std::string& content_handler_name,
-    URLResponsePtr response,
+    const std::string& content_handler_name, URLResponsePtr response,
     InterfaceRequest<Application> application_request) {
   ApplicationInstance* instance =
       GetOrStartApplicationInstance(content_handler_name);
-  if (!instance)
-    return;
+  if (!instance) return;
   ContentHandler* content_handler = instance->GetOrCreateContentHandler();
   content_handler->StartApplication(std::move(application_request),
                                     std::move(response));
@@ -55,7 +54,10 @@ ApplicationInstance* ApplicationManager::GetOrStartApplicationInstance(
     return nullptr;
   }
   if (!instance->is_initialized()) {
-    instance->Initialize(std::make_unique<ShellImpl>(name, this), nullptr,
+    instance->Initialize(std::make_unique<ShellImpl>(name, this),
+                         args_for_.count(name)
+                             ? mojo::Array<mojo::String>::From(args_for_[name])
+                             : nullptr,
                          name);
     instance->set_connection_error_handler(
         [this, instance]() { table_.StopApplication(instance->name()); });

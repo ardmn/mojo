@@ -5,8 +5,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "mojo/application_manager/application_manager.h"
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "lib/ftl/command_line.h"
 #include "lib/mtl/tasks/message_loop.h"
+#include "mojo/application_manager/application_manager.h"
 
 int main(int argc, char** argv) {
   if (argc < 2) {
@@ -14,13 +19,19 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  const char* initial_app = argv[1];
-  mojo::ApplicationManager manager;
+  auto args = ftl::CommandLineFromArgcArgv(argc, argv);
+  const auto& initial_app = args.positional_args()[0];
+  std::unordered_map<std::string, std::vector<std::string>> args_for;
+  // TODO(alhaad): This implementation passes all the command-line arguments
+  // to the initial application. Having an '--args-for' option is desirable.
+  args_for[initial_app] = args.positional_args();
+  mojo::ApplicationManager manager(std::move(args_for));
 
   mtl::MessageLoop message_loop;
   message_loop.task_runner()->PostTask([&]() {
-    if (!manager.StartInitialApplication(initial_app))
+    if (!manager.StartInitialApplication(initial_app)) {
       exit(1);
+    }
   });
 
   message_loop.Run();

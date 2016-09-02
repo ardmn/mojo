@@ -6,7 +6,10 @@
 #define MOJO_APPLICATION_MANAGER_APPLICATION_MANAGER_H_
 
 #include <string>
+#include <unordered_map>
+#include <vector>
 
+#include "lib/ftl/command_line.h"
 #include "mojo/application_manager/application_table.h"
 #include "mojo/public/interfaces/application/service_provider.mojom.h"
 #include "mojo/public/interfaces/network/url_response.mojom.h"
@@ -15,7 +18,8 @@ namespace mojo {
 
 class ApplicationManager {
  public:
-  ApplicationManager();
+  explicit ApplicationManager(
+      std::unordered_map<std::string, std::vector<std::string>>&& args_for);
   ~ApplicationManager();
 
   bool StartInitialApplication(std::string name);
@@ -25,14 +29,14 @@ class ApplicationManager {
                             InterfaceRequest<ServiceProvider> services);
 
   void StartApplicationUsingContentHandler(
-      const std::string& content_handler_name,
-      URLResponsePtr response,
+      const std::string& content_handler_name, URLResponsePtr response,
       InterfaceRequest<Application> application_request);
 
  private:
   ApplicationInstance* GetOrStartApplicationInstance(std::string name);
 
   ApplicationTable table_;
+  std::unordered_map<std::string, std::vector<std::string>> args_for_;
 
   FTL_DISALLOW_COPY_AND_ASSIGN(ApplicationManager);
 };
