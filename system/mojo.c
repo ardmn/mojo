@@ -418,7 +418,7 @@ MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-      case ERR_NOT_READY:
+      case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
         return MOJO_SYSTEM_RESULT_UNKNOWN;
@@ -449,7 +449,7 @@ MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-      case ERR_NOT_READY:
+      case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
         return MOJO_SYSTEM_RESULT_UNKNOWN;
@@ -473,7 +473,7 @@ MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-    case ERR_NOT_READY:
+    case ERR_SHOULD_WAIT:
       return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
     default:
       return MOJO_SYSTEM_RESULT_INTERNAL;
@@ -512,7 +512,7 @@ MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-      case ERR_NOT_READY:
+      case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
         return MOJO_SYSTEM_RESULT_INTERNAL;
@@ -546,7 +546,7 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-      case ERR_NOT_READY:
+      case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
       default:
         return MOJO_SYSTEM_RESULT_INTERNAL;
