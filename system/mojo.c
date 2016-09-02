@@ -60,7 +60,7 @@ MojoResult MojoClose(MojoHandle handle) {
 MojoResult MojoGetRights(MojoHandle handle, MojoHandleRights* rights) {
   mx_handle_basic_info_t handle_info;
   mx_ssize_t result =
-      mx_handle_get_info((mx_handle_t)handle, MX_INFO_HANDLE_BASIC,
+      mx_object_get_info((mx_handle_t)handle, MX_INFO_HANDLE_BASIC,
                          &handle_info, sizeof(handle_info));
   if (result < 0) {
     switch (result) {
