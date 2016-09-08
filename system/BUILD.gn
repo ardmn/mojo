@@ -6,6 +6,7 @@ shared_library("libmojo") {
   output_name = "mojo"
   sources = [
     "mojo.c",
+    "mojo_export.h",
   ]
 
   deps = [

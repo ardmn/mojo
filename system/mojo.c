@@ -14,6 +14,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "mojo/system/mojo_export.h"
+
 // MojoTimeTicks is in microseconds.
 // mx_time_t is in nanoseconds.
 
@@ -44,7 +46,7 @@ static_assert(MOJO_HANDLE_RIGHT_EXECUTE == MX_RIGHT_EXECUTE,
 // TODO(vtl): Add get/set options rights to Magenta, and debug to Mojo (and
 // align their values).
 
-MojoResult MojoClose(MojoHandle handle) {
+MOJO_EXPORT MojoResult MojoClose(MojoHandle handle) {
   mx_status_t status = mx_handle_close((mx_handle_t)handle);
   switch (status) {
     case NO_ERROR:
@@ -57,12 +59,12 @@ MojoResult MojoClose(MojoHandle handle) {
   }
 }
 
-MojoResult MojoGetRights(MojoHandle handle, MojoHandleRights* rights) {
+MOJO_EXPORT MojoResult MojoGetRights(MojoHandle handle,
+                                     MojoHandleRights* rights) {
   mx_info_handle_basic_t handle_info;
-  mx_ssize_t result =
-      mx_object_get_info((mx_handle_t)handle, MX_INFO_HANDLE_BASIC,
-                         sizeof(handle_info.rec), &handle_info,
-                         sizeof(handle_info));
+  mx_ssize_t result = mx_object_get_info(
+      (mx_handle_t)handle, MX_INFO_HANDLE_BASIC, sizeof(handle_info.rec),
+      &handle_info, sizeof(handle_info));
   if (result < 0) {
     switch (result) {
       case ERR_BUSY:
@@ -82,9 +84,10 @@ MojoResult MojoGetRights(MojoHandle handle, MojoHandleRights* rights) {
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoReplaceHandleWithReducedRights(MojoHandle handle,
-                                              MojoHandleRights rights_to_remove,
-                                              MojoHandle* replacement_handle) {
+MOJO_EXPORT MojoResult
+MojoReplaceHandleWithReducedRights(MojoHandle handle,
+                                   MojoHandleRights rights_to_remove,
+                                   MojoHandle* replacement_handle) {
   MojoHandleRights original_rights;
   MojoResult result = MojoGetRights(handle, &original_rights);
   if (result != MOJO_RESULT_OK)
@@ -111,10 +114,10 @@ MojoResult MojoReplaceHandleWithReducedRights(MojoHandle handle,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoDuplicateHandleWithReducedRights(
-    MojoHandle handle,
-    MojoHandleRights rights_to_remove,
-    MojoHandle* new_handle) {
+MOJO_EXPORT MojoResult
+MojoDuplicateHandleWithReducedRights(MojoHandle handle,
+                                     MojoHandleRights rights_to_remove,
+                                     MojoHandle* new_handle) {
   MojoHandleRights original_rights;
   MojoResult result = MojoGetRights(handle, &original_rights);
   if (result != MOJO_RESULT_OK)
@@ -141,7 +144,8 @@ MojoResult MojoDuplicateHandleWithReducedRights(
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoDuplicateHandle(MojoHandle handle, MojoHandle* new_handle) {
+MOJO_EXPORT MojoResult MojoDuplicateHandle(MojoHandle handle,
+                                           MojoHandle* new_handle) {
   mx_handle_t result =
       mx_handle_duplicate((mx_handle_t)handle, MX_RIGHT_SAME_RIGHTS);
   if (result < 0) {
@@ -163,7 +167,7 @@ MojoResult MojoDuplicateHandle(MojoHandle handle, MojoHandle* new_handle) {
 
 // time.h ----------------------------------------------------------------------
 
-MojoTimeTicks MojoGetTimeTicksNow() {
+MOJO_EXPORT MojoTimeTicks MojoGetTimeTicksNow() {
   return TimeToMojoTicks(mx_current_time());
 }
 
@@ -181,10 +185,10 @@ static_assert(sizeof(struct MojoHandleSignalsState) ==
                   sizeof(mx_signals_state_t),
               "Signals state structs must match");
 
-MojoResult MojoWait(MojoHandle handle,
-                    MojoHandleSignals signals,
-                    MojoDeadline deadline,
-                    struct MojoHandleSignalsState* signals_state) {
+MOJO_EXPORT MojoResult MojoWait(MojoHandle handle,
+                                MojoHandleSignals signals,
+                                MojoDeadline deadline,
+                                struct MojoHandleSignalsState* signals_state) {
   mx_time_t mx_deadline = MojoDeadlineToTime(deadline);
   mx_signals_state_t* mx_signals_state = (mx_signals_state_t*)signals_state;
 
@@ -219,12 +223,13 @@ MojoResult MojoWait(MojoHandle handle,
   }
 }
 
-MojoResult MojoWaitMany(const MojoHandle* handles,
-                        const MojoHandleSignals* signals,
-                        uint32_t num_handles,
-                        MojoDeadline deadline,
-                        uint32_t* result_index,
-                        struct MojoHandleSignalsState* signals_states) {
+MOJO_EXPORT MojoResult
+MojoWaitMany(const MojoHandle* handles,
+             const MojoHandleSignals* signals,
+             uint32_t num_handles,
+             MojoDeadline deadline,
+             uint32_t* result_index,
+             struct MojoHandleSignalsState* signals_states) {
   const mx_handle_t* mx_handles = (const mx_handle_t*)handles;
   const mx_signals_t* mx_signals = (const mx_signals_t*)signals;
   mx_time_t mx_deadline = MojoDeadlineToTime(deadline);
@@ -262,10 +267,10 @@ MojoResult MojoWaitMany(const MojoHandle* handles,
 
 // message_pipe.h --------------------------------------------------------------
 
-MojoResult MojoCreateMessagePipe(
-    const struct MojoCreateMessagePipeOptions* options,
-    MojoHandle* message_pipe_handle0,
-    MojoHandle* message_pipe_handle1) {
+MOJO_EXPORT MojoResult
+MojoCreateMessagePipe(const struct MojoCreateMessagePipeOptions* options,
+                      MojoHandle* message_pipe_handle0,
+                      MojoHandle* message_pipe_handle1) {
   if (options && options->flags != MOJO_CREATE_MESSAGE_PIPE_OPTIONS_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t mx_handles[2];
@@ -285,12 +290,12 @@ MojoResult MojoCreateMessagePipe(
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
-                            const void* bytes,
-                            uint32_t num_bytes,
-                            const MojoHandle* handles,
-                            uint32_t num_handles,
-                            MojoWriteMessageFlags flags) {
+MOJO_EXPORT MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
+                                        const void* bytes,
+                                        uint32_t num_bytes,
+                                        const MojoHandle* handles,
+                                        uint32_t num_handles,
+                                        MojoWriteMessageFlags flags) {
   mx_handle_t* mx_handles = (mx_handle_t*)handles;
   // TODO(abarth): Handle messages that are too big to fit.
   mx_status_t status =
@@ -316,12 +321,12 @@ MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
   }
 }
 
-MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
-                           void* bytes,
-                           uint32_t* num_bytes,
-                           MojoHandle* handles,
-                           uint32_t* num_handles,
-                           MojoReadMessageFlags flags) {
+MOJO_EXPORT MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
+                                       void* bytes,
+                                       uint32_t* num_bytes,
+                                       MojoHandle* handles,
+                                       uint32_t* num_handles,
+                                       MojoReadMessageFlags flags) {
   mx_handle_t* mx_handles = (mx_handle_t*)handles;
   // TODO(abarth): Handle messages that were too big to fit.
   mx_status_t status =
@@ -352,9 +357,10 @@ MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
 
 // data_pipe.h -----------------------------------------------------------------
 
-MojoResult MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
-                              MojoHandle* data_pipe_producer_handle,
-                              MojoHandle* data_pipe_consumer_handle) {
+MOJO_EXPORT MojoResult
+MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
+                   MojoHandle* data_pipe_producer_handle,
+                   MojoHandle* data_pipe_consumer_handle) {
   uint32_t element_num_bytes = 1u;
   uint32_t capacity_num_bytes = 0u;
   if (options) {
@@ -385,23 +391,23 @@ MojoResult MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoSetDataPipeProducerOptions(
+MOJO_EXPORT MojoResult MojoSetDataPipeProducerOptions(
     MojoHandle data_pipe_producer_handle,
     const struct MojoDataPipeProducerOptions* options) {
   return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
-MojoResult MojoGetDataPipeProducerOptions(
-    MojoHandle data_pipe_producer_handle,
-    struct MojoDataPipeProducerOptions* options,
-    uint32_t options_num_bytes) {
+MOJO_EXPORT MojoResult
+MojoGetDataPipeProducerOptions(MojoHandle data_pipe_producer_handle,
+                               struct MojoDataPipeProducerOptions* options,
+                               uint32_t options_num_bytes) {
   return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
-MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
-                         const void* elements,
-                         uint32_t* num_bytes,
-                         MojoWriteDataFlags flags) {
+MOJO_EXPORT MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
+                                     const void* elements,
+                                     uint32_t* num_bytes,
+                                     MojoWriteDataFlags flags) {
   if (flags) {
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
@@ -430,10 +436,10 @@ MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
-                              void** buffer,
-                              uint32_t* buffer_num_bytes,
-                              MojoWriteDataFlags flags) {
+MOJO_EXPORT MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
+                                          void** buffer,
+                                          uint32_t* buffer_num_bytes,
+                                          MojoWriteDataFlags flags) {
   if (flags) {
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
@@ -462,8 +468,8 @@ MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
-                            uint32_t num_bytes_written) {
+MOJO_EXPORT MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
+                                        uint32_t num_bytes_written) {
   mx_status_t result = mx_datapipe_end_write(
       (mx_handle_t)data_pipe_producer_handle, num_bytes_written);
   switch (result) {
@@ -483,23 +489,23 @@ MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
   }
 }
 
-MojoResult MojoSetDataPipeConsumerOptions(
+MOJO_EXPORT MojoResult MojoSetDataPipeConsumerOptions(
     MojoHandle data_pipe_consumer_handle,
     const struct MojoDataPipeConsumerOptions* options) {
   return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
-MojoResult MojoGetDataPipeConsumerOptions(
-    MojoHandle data_pipe_consumer_handle,
-    struct MojoDataPipeConsumerOptions* options,
-    uint32_t options_num_bytes) {
+MOJO_EXPORT MojoResult
+MojoGetDataPipeConsumerOptions(MojoHandle data_pipe_consumer_handle,
+                               struct MojoDataPipeConsumerOptions* options,
+                               uint32_t options_num_bytes) {
   return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
 }
 
-MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
-                        void* elements,
-                        uint32_t* num_bytes,
-                        MojoReadDataFlags flags) {
+MOJO_EXPORT MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
+                                    void* elements,
+                                    uint32_t* num_bytes,
+                                    MojoReadDataFlags flags) {
   if (flags) {
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
@@ -531,10 +537,10 @@ MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
-                             const void** buffer,
-                             uint32_t* buffer_num_bytes,
-                             MojoReadDataFlags flags) {
+MOJO_EXPORT MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
+                                         const void** buffer,
+                                         uint32_t* buffer_num_bytes,
+                                         MojoReadDataFlags flags) {
   if (flags) {
     // TODO: Support flags
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
@@ -563,8 +569,8 @@ MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoEndReadData(MojoHandle data_pipe_consumer_handle,
-                           uint32_t num_bytes_read) {
+MOJO_EXPORT MojoResult MojoEndReadData(MojoHandle data_pipe_consumer_handle,
+                                       uint32_t num_bytes_read) {
   mx_status_t result = mx_datapipe_end_read(
       (mx_handle_t)data_pipe_consumer_handle, num_bytes_read);
   switch (result) {
@@ -584,10 +590,10 @@ MojoResult MojoEndReadData(MojoHandle data_pipe_consumer_handle,
 
 // buffer.h --------------------------------------------------------------------
 
-MojoResult MojoCreateSharedBuffer(
-    const struct MojoCreateSharedBufferOptions* options,
-    uint64_t num_bytes,
-    MojoHandle* shared_buffer_handle) {
+MOJO_EXPORT MojoResult
+MojoCreateSharedBuffer(const struct MojoCreateSharedBufferOptions* options,
+                       uint64_t num_bytes,
+                       MojoHandle* shared_buffer_handle) {
   if (options && options->flags != MOJO_CREATE_SHARED_BUFFER_OPTIONS_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   mx_handle_t result = mx_vmo_create(num_bytes);
@@ -605,7 +611,7 @@ MojoResult MojoCreateSharedBuffer(
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoDuplicateBufferHandle(
+MOJO_EXPORT MojoResult MojoDuplicateBufferHandle(
     MojoHandle buffer_handle,
     const struct MojoDuplicateBufferHandleOptions* options,
     MojoHandle* new_buffer_handle) {
@@ -615,9 +621,10 @@ MojoResult MojoDuplicateBufferHandle(
   return MojoDuplicateHandle(buffer_handle, new_buffer_handle);
 }
 
-MojoResult MojoGetBufferInformation(MojoHandle buffer_handle,
-                                    struct MojoBufferInformation* info,
-                                    uint32_t info_num_bytes) {
+MOJO_EXPORT MojoResult
+MojoGetBufferInformation(MojoHandle buffer_handle,
+                         struct MojoBufferInformation* info,
+                         uint32_t info_num_bytes) {
   if (!info || info_num_bytes < 16)
     return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t vmo_handle = (mx_handle_t)buffer_handle;
@@ -639,11 +646,11 @@ MojoResult MojoGetBufferInformation(MojoHandle buffer_handle,
   }
 }
 
-MojoResult MojoMapBuffer(MojoHandle buffer_handle,
-                         uint64_t offset,
-                         uint64_t num_bytes,
-                         void** buffer,
-                         MojoMapBufferFlags flags) {
+MOJO_EXPORT MojoResult MojoMapBuffer(MojoHandle buffer_handle,
+                                     uint64_t offset,
+                                     uint64_t num_bytes,
+                                     void** buffer,
+                                     MojoMapBufferFlags flags) {
   if (flags != MOJO_MAP_BUFFER_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
   mx_handle_t vmo_handle = (mx_handle_t)buffer_handle;
@@ -669,7 +676,7 @@ MojoResult MojoMapBuffer(MojoHandle buffer_handle,
   }
 }
 
-MojoResult MojoUnmapBuffer(void* buffer) {
+MOJO_EXPORT MojoResult MojoUnmapBuffer(void* buffer) {
   uintptr_t address = (uintptr_t)buffer;
   // TODO(abarth): mx_process_unmap_vm needs the length to unmap, but Mojo
   // doesn't give us the length.
@@ -709,8 +716,9 @@ static_assert(offsetof(struct MojoWaitSetResult, signals_state) ==
 #define EXTENT_OF(struct_type, member_name) \
   (offsetof(struct_type, member_name) + sizeof(((struct_type*)0)->member_name))
 
-MojoResult MojoCreateWaitSet(const struct MojoCreateWaitSetOptions* options,
-                             MojoHandle* handle) {
+MOJO_EXPORT MojoResult
+MojoCreateWaitSet(const struct MojoCreateWaitSetOptions* options,
+                  MojoHandle* handle) {
   if (options) {
     if (options->struct_size <
         EXTENT_OF(struct MojoCreateWaitSetOptions, struct_size))
@@ -736,11 +744,12 @@ MojoResult MojoCreateWaitSet(const struct MojoCreateWaitSetOptions* options,
   return MOJO_RESULT_OK;
 }
 
-MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
-                          MojoHandle handle,
-                          MojoHandleSignals signals,
-                          uint64_t cookie,
-                          const struct MojoWaitSetAddOptions* options) {
+MOJO_EXPORT MojoResult
+MojoWaitSetAdd(MojoHandle wait_set_handle,
+               MojoHandle handle,
+               MojoHandleSignals signals,
+               uint64_t cookie,
+               const struct MojoWaitSetAddOptions* options) {
   if (options) {
     if (options->struct_size <
         EXTENT_OF(struct MojoWaitSetAddOptions, struct_size))
@@ -777,7 +786,8 @@ MojoResult MojoWaitSetAdd(MojoHandle wait_set_handle,
   }
 }
 
-MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle, uint64_t cookie) {
+MOJO_EXPORT MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle,
+                                         uint64_t cookie) {
   mx_status_t status = mx_waitset_remove((mx_handle_t)wait_set_handle, cookie);
   switch (status) {
     case NO_ERROR:
@@ -794,11 +804,11 @@ MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle, uint64_t cookie) {
   }
 }
 
-MojoResult MojoWaitSetWait(MojoHandle wait_set_handle,
-                           MojoDeadline deadline,
-                           uint32_t* num_results,
-                           struct MojoWaitSetResult* results,
-                           uint32_t* max_results) {
+MOJO_EXPORT MojoResult MojoWaitSetWait(MojoHandle wait_set_handle,
+                                       MojoDeadline deadline,
+                                       uint32_t* num_results,
+                                       struct MojoWaitSetResult* results,
+                                       uint32_t* max_results) {
   mx_status_t status = mx_waitset_wait(
       (mx_handle_t)wait_set_handle, MojoDeadlineToTime(deadline), num_results,
       (mx_waitset_result_t*)results, max_results);
