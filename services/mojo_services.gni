@@ -15,4 +15,6 @@ mojo_services = [
   "//mojo/services/gpu/interfaces",
   "//mojo/services/log/interfaces",
   "//mojo/services/tracing/interfaces",
+  "//mojo/services/ui/fonts/interfaces",
+  "//mojo/services/ui/views/interfaces",
 ]

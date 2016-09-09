@@ -1,0 +1,46 @@
+// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module mojo;
+
+enum FontWidth {
+  ULTRA_CONDENSED,
+  EXTRA_CONDENSED,
+  CONDENSED,
+  SEMI_CONDENSED,
+  NORMAL,
+  SEMI_EXPANDED,
+  EXPANDED,
+  EXTRA_EXPANDED,
+  ULTRA_EXPANDED,
+};
+
+enum FontSlant {
+  UPRIGHT,
+  ITALIC,
+};
+
+struct FontRequest {
+  // For example, "Roboto".
+  string family;
+
+  // For example, 400 is normal, 700 is bold.
+  uint32 weight = 400;
+
+  FontWidth width = FontWidth.NORMAL;
+  FontSlant slant = FontSlant.UPRIGHT;
+};
+
+struct FontData {
+  handle vmo;
+};
+
+struct FontResponse {
+  FontData data;
+};
+
+[ServiceName="mojo::FontProvider"]
+interface FontProvider {
+  GetFont(FontRequest request) => (FontResponse? response);
+};
