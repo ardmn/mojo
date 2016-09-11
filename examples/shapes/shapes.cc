@@ -7,6 +7,7 @@
 #include <string>
 #include <utility>
 
+#include <magenta/process.h>
 #include <magenta/syscalls.h>
 #include <mojo/system/main.h>
 
@@ -50,9 +51,9 @@ class ShapesApp : public mojo::ApplicationImplBase {
     size_t row_bytes = info_->row_bytes;
     size_t size = row_bytes * info_->size->height;
 
-    mx_status_t status =
-        mx_process_vm_map(0, info_->vmo.get().value(), 0, size, &buffer,
-                          MX_VM_FLAG_PERM_READ | MX_VM_FLAG_PERM_WRITE);
+    mx_status_t status = mx_process_map_vm(
+        mx_process_self(), info_->vmo.get().value(), 0, size, &buffer,
+        MX_VM_FLAG_PERM_READ | MX_VM_FLAG_PERM_WRITE);
 
     if (status < 0) {
       fprintf(stderr, "Cannot map framebuffer %d\n", status);

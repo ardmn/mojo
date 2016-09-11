@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 #include <assert.h>
+#include <magenta/process.h>
 #include <magenta/syscalls.h>
 #include <mojo/system/buffer.h>
 #include <mojo/system/data_pipe.h>
@@ -659,8 +660,8 @@ MOJO_EXPORT MojoResult MojoMapBuffer(MojoHandle buffer_handle,
   // this is a reasonable default.
   uint32_t mx_flags = MX_VM_FLAG_PERM_READ | MX_VM_FLAG_PERM_WRITE;
 
-  mx_status_t status =
-      mx_process_map_vm(0, vmo_handle, offset, num_bytes, mx_pointer, mx_flags);
+  mx_status_t status = mx_process_map_vm(mx_process_self(), vmo_handle, offset,
+                                         num_bytes, mx_pointer, mx_flags);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
@@ -681,7 +682,7 @@ MOJO_EXPORT MojoResult MojoUnmapBuffer(void* buffer) {
   // TODO(abarth): mx_process_unmap_vm needs the length to unmap, but Mojo
   // doesn't give us the length.
   mx_size_t length = 0;
-  mx_status_t status = mx_process_unmap_vm(0, address, length);
+  mx_status_t status = mx_process_unmap_vm(mx_process_self(), address, length);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
