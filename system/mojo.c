@@ -353,6 +353,26 @@ MOJO_EXPORT MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
 
 // data_pipe.h -----------------------------------------------------------------
 
+static_assert(MOJO_WRITE_DATA_FLAG_ALL_OR_NONE ==
+                  MX_DATAPIPE_WRITE_FLAG_ALL_OR_NONE,
+              "Data pipe write flags must match");
+static_assert(MOJO_WRITE_DATA_FLAG_ALL_OR_NONE == MX_DATAPIPE_WRITE_FLAG_MASK,
+              "Unknown Magenta data pipe write flag(s)");
+
+static_assert(MOJO_READ_DATA_FLAG_ALL_OR_NONE ==
+                  MX_DATAPIPE_READ_FLAG_ALL_OR_NONE,
+              "Data pipe read flags must match");
+static_assert(MOJO_READ_DATA_FLAG_DISCARD == MX_DATAPIPE_READ_FLAG_DISCARD,
+              "Data pipe read flags must match");
+static_assert(MOJO_READ_DATA_FLAG_QUERY == MX_DATAPIPE_READ_FLAG_QUERY,
+              "Data pipe read flags must match");
+static_assert(MOJO_READ_DATA_FLAG_PEEK == MX_DATAPIPE_READ_FLAG_PEEK,
+              "Data pipe read flags must match");
+static_assert(MOJO_READ_DATA_FLAG_ALL_OR_NONE | MOJO_READ_DATA_FLAG_DISCARD |
+                  MOJO_READ_DATA_FLAG_QUERY |
+                  MOJO_READ_DATA_FLAG_PEEK == MX_DATAPIPE_WRITE_FLAG_MASK,
+              "Unknown Magenta data pipe read flag(s)");
+
 MOJO_EXPORT MojoResult
 MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
                    MojoHandle* data_pipe_producer_handle,
@@ -404,14 +424,8 @@ MOJO_EXPORT MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
                                      const void* elements,
                                      uint32_t* num_bytes,
                                      MojoWriteDataFlags flags) {
-  if (flags) {
-    // TODO: Support flags
-    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-  }
-  mx_ssize_t mx_bytes_written =
-      mx_datapipe_write((mx_handle_t)data_pipe_producer_handle,
-                        0u,  // TODO: flags
-                        *num_bytes, elements);
+  mx_ssize_t mx_bytes_written = mx_datapipe_write(
+      (mx_handle_t)data_pipe_producer_handle, flags, *num_bytes, elements);
   if (mx_bytes_written < 0) {
     switch (mx_bytes_written) {
       case ERR_INVALID_ARGS:
@@ -441,14 +455,8 @@ MOJO_EXPORT MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
                                           void** buffer,
                                           uint32_t* buffer_num_bytes,
                                           MojoWriteDataFlags flags) {
-  if (flags) {
-    // TODO: Support flags
-    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-  }
-  mx_ssize_t result =
-      mx_datapipe_begin_write((mx_handle_t)data_pipe_producer_handle,
-                              0u,  // TODO: flags
-                              (uintptr_t*)buffer);
+  mx_ssize_t result = mx_datapipe_begin_write(
+      (mx_handle_t)data_pipe_producer_handle, flags, (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
       case ERR_INVALID_ARGS:
@@ -509,12 +517,8 @@ MOJO_EXPORT MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
                                     void* elements,
                                     uint32_t* num_bytes,
                                     MojoReadDataFlags flags) {
-  if (flags) {
-    // TODO: Support flags
-    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-  }
   mx_ssize_t bytes_read = mx_datapipe_read(
-      (mx_handle_t)data_pipe_consumer_handle, 0u, *num_bytes, elements);
+      (mx_handle_t)data_pipe_consumer_handle, flags, *num_bytes, elements);
   if (bytes_read < 0) {
     switch (bytes_read) {
       case ERR_INVALID_ARGS:
@@ -547,14 +551,8 @@ MOJO_EXPORT MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
                                          const void** buffer,
                                          uint32_t* buffer_num_bytes,
                                          MojoReadDataFlags flags) {
-  if (flags) {
-    // TODO: Support flags
-    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-  }
-  mx_ssize_t result =
-      mx_datapipe_begin_read((mx_handle_t)data_pipe_consumer_handle,
-                             0u,  // TODO: flags
-                             (uintptr_t*)buffer);
+  mx_ssize_t result = mx_datapipe_begin_read(
+      (mx_handle_t)data_pipe_consumer_handle, flags, (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
       case ERR_INVALID_ARGS:
