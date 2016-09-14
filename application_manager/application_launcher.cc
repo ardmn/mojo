@@ -25,6 +25,7 @@
 namespace mojo {
 namespace {
 
+constexpr char kFileUriPrefix[] = "file://";
 constexpr char kMojoAppDir[] = "/boot/apps/";
 constexpr char kMojoScheme[] = "mojo:";
 constexpr size_t kMojoSchemeLength = sizeof(kMojoScheme) - 1;
@@ -44,6 +45,10 @@ std::string GetPathFromApplicationName(const std::string& name) {
   if (name.find(kMojoScheme) == 0)
     return kMojoAppDir + name.substr(kMojoSchemeLength);
   return std::string();
+}
+
+std::string GetUriFromPath(const std::string& path) {
+  return kFileUriPrefix + path;
 }
 
 mojo::InterfaceRequest<mojo::Application> LaunchWithContentHandler(
@@ -68,6 +73,7 @@ mojo::InterfaceRequest<mojo::Application> LaunchWithContentHandler(
       shebang.substr(kMojoMagicLength, newline - kMojoMagicLength);
   URLResponsePtr response = URLResponse::New();
   response->status_code = 200;
+  response->url = GetUriFromPath(path);
   mojo::DataPipe data_pipe;
   response->body = std::move(data_pipe.consumer_handle);
   mtl::CopyFromFileDescriptor(
