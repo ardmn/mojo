@@ -4,6 +4,18 @@
 
 executable("application_manager") {
   sources = [
+    "main.cc",
+  ]
+
+  deps = [
+    ":application_manager_lib",
+    "//lib/ftl",
+    "//lib/mtl",
+  ]
+}
+
+source_set("application_manager_lib") {
+  sources = [
     "application_connector_impl.cc",
     "application_connector_impl.h",
     "application_instance.cc",
@@ -14,7 +26,6 @@ executable("application_manager") {
     "application_manager.h",
     "application_table.cc",
     "application_table.h",
-    "main.cc",
     "shell_impl.cc",
     "shell_impl.h",
   ]
