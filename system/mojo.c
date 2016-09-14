@@ -68,8 +68,6 @@ MOJO_EXPORT MojoResult MojoGetRights(MojoHandle handle,
       &handle_info, sizeof(handle_info));
   if (result < 0) {
     switch (result) {
-      case ERR_BUSY:
-        return MOJO_SYSTEM_RESULT_BUSY;
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -98,8 +96,6 @@ MojoReplaceHandleWithReducedRights(MojoHandle handle,
       mx_handle_replace((mx_handle_t)handle, new_rights);
   if (new_mx_handle < 0) {
     switch (new_mx_handle) {
-      case ERR_BUSY:
-        return MOJO_SYSTEM_RESULT_BUSY;
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -128,8 +124,6 @@ MojoDuplicateHandleWithReducedRights(MojoHandle handle,
       mx_handle_duplicate((mx_handle_t)handle, new_rights);
   if (new_mx_handle < 0) {
     switch (new_mx_handle) {
-      case ERR_BUSY:
-        return MOJO_SYSTEM_RESULT_BUSY;
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -199,7 +193,7 @@ MOJO_EXPORT MojoResult MojoWait(MojoHandle handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_CANCELLED:
+    case ERR_HANDLE_CLOSED:
       return MOJO_SYSTEM_RESULT_CANCELLED;
     // TODO(vtl): This is currently not specified for MojoWait(), nor does
     // mx_handle_wait_one() currently return this.
@@ -212,9 +206,6 @@ MOJO_EXPORT MojoResult MojoWait(MojoHandle handle,
       return MOJO_SYSTEM_RESULT_DEADLINE_EXCEEDED;
     case ERR_BAD_STATE:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-    // TODO(vtl): mx_handle_wait_one() currently never returns this.
-    case ERR_BUSY:
-      return MOJO_SYSTEM_RESULT_BUSY;
     // TODO(vtl): The Mojo version doesn't require any rights to wait, whereas
     // Magenta requires MX_RIGHT_READ.
     case ERR_ACCESS_DENIED:
@@ -243,7 +234,7 @@ MojoWaitMany(const MojoHandle* handles,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_CANCELLED:
+    case ERR_HANDLE_CLOSED:
       return MOJO_SYSTEM_RESULT_CANCELLED;
     case ERR_NO_MEMORY:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
@@ -254,9 +245,6 @@ MojoWaitMany(const MojoHandle* handles,
       return MOJO_SYSTEM_RESULT_DEADLINE_EXCEEDED;
     case ERR_BAD_STATE:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-    // TODO(vtl): mx_handle_wait_many() currently never returns this.
-    case ERR_BUSY:
-      return MOJO_SYSTEM_RESULT_BUSY;
     // TODO(vtl): The Mojo version doesn't require any rights to wait, whereas
     // Magenta requires MX_RIGHT_READ.
     case ERR_ACCESS_DENIED:
@@ -315,7 +303,6 @@ MOJO_EXPORT MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NO_MEMORY:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
-    case ERR_TOO_BIG:
     // TODO(abarth): Handle messages that are too big to fit.
     default:
       return MOJO_SYSTEM_RESULT_UNKNOWN;
@@ -349,7 +336,7 @@ MOJO_EXPORT MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
     case ERR_NO_MEMORY:
       // Notice the collision with ERR_NOT_ENOUGH_BUFFER.
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
-    case ERR_NOT_ENOUGH_BUFFER:
+    case ERR_BUFFER_TOO_SMALL:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
     default:
       return MOJO_SYSTEM_RESULT_UNKNOWN;
