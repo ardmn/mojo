@@ -179,6 +179,12 @@ static_assert(MOJO_HANDLE_SIGNAL_PEER_CLOSED == MX_SIGNAL_PEER_CLOSED,
 static_assert(sizeof(struct MojoHandleSignalsState) ==
                   sizeof(mx_signals_state_t),
               "Signals state structs must match");
+static_assert(offsetof(struct MojoHandleSignalsState, satisfied_signals) ==
+                  offsetof(mx_signals_state_t, satisfied),
+              "Signals state structs must match");
+static_assert(offsetof(struct MojoHandleSignalsState, satisfiable_signals) ==
+                  offsetof(mx_signals_state_t, satisfiable),
+              "Signals state structs must match");
 
 MOJO_EXPORT MojoResult MojoWait(MojoHandle handle,
                                 MojoHandleSignals signals,
@@ -293,8 +299,9 @@ MOJO_EXPORT MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -323,8 +330,9 @@ MOJO_EXPORT MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -406,16 +414,21 @@ MOJO_EXPORT MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
                         *num_bytes, elements);
   if (mx_bytes_written < 0) {
     switch (mx_bytes_written) {
-      case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
       case ERR_BAD_STATE:
       case ERR_REMOTE_CLOSED:
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
+      case ERR_OUT_OF_RANGE:
+        return MOJO_SYSTEM_RESULT_OUT_OF_RANGE;
       case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
+      case ERR_ALREADY_BOUND:
+        return MOJO_SYSTEM_RESULT_BUSY;
       default:
         return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
@@ -438,8 +451,9 @@ MOJO_EXPORT MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
                               (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
-      case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -448,6 +462,8 @@ MOJO_EXPORT MojoResult MojoBeginWriteData(MojoHandle data_pipe_producer_handle,
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
       case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
+      case ERR_ALREADY_BOUND:
+        return MOJO_SYSTEM_RESULT_BUSY;
       default:
         return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
@@ -463,15 +479,14 @@ MOJO_EXPORT MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
   switch (result) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
-    case ERR_SHOULD_WAIT:
-      return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
     default:
       return MOJO_SYSTEM_RESULT_INTERNAL;
   }
@@ -502,8 +517,9 @@ MOJO_EXPORT MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
       (mx_handle_t)data_pipe_consumer_handle, 0u, *num_bytes, elements);
   if (bytes_read < 0) {
     switch (bytes_read) {
-      case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -514,6 +530,8 @@ MOJO_EXPORT MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
         return MOJO_SYSTEM_RESULT_OUT_OF_RANGE;
       case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
+      case ERR_ALREADY_BOUND:
+        return MOJO_SYSTEM_RESULT_BUSY;
       default:
         return MOJO_SYSTEM_RESULT_INTERNAL;
     }
@@ -539,8 +557,9 @@ MOJO_EXPORT MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
                              (uintptr_t*)buffer);
   if (result < 0) {
     switch (result) {
-      case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_ACCESS_DENIED:
         return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -549,6 +568,8 @@ MOJO_EXPORT MojoResult MojoBeginReadData(MojoHandle data_pipe_consumer_handle,
         return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
       case ERR_SHOULD_WAIT:
         return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
+      case ERR_ALREADY_BOUND:
+        return MOJO_SYSTEM_RESULT_BUSY;
       default:
         return MOJO_SYSTEM_RESULT_INTERNAL;
     }
@@ -564,8 +585,9 @@ MOJO_EXPORT MojoResult MojoEndReadData(MojoHandle data_pipe_consumer_handle,
   switch (result) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -624,8 +646,9 @@ MojoGetBufferInformation(MojoHandle buffer_handle,
       info->flags = MOJO_BUFFER_INFORMATION_FLAG_NONE;
       info->num_bytes = num_bytes;
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -652,8 +675,9 @@ MOJO_EXPORT MojoResult MojoMapBuffer(MojoHandle buffer_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -757,8 +781,9 @@ MojoWaitSetAdd(MojoHandle wait_set_handle,
       return MOJO_RESULT_OK;
     case ERR_NO_MEMORY:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -780,8 +805,9 @@ MOJO_EXPORT MojoResult MojoWaitSetRemove(MojoHandle wait_set_handle,
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
@@ -805,8 +831,9 @@ MOJO_EXPORT MojoResult MojoWaitSetWait(MojoHandle wait_set_handle,
       return MOJO_RESULT_OK;
     case ERR_NO_MEMORY:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
-    case ERR_BAD_HANDLE:
     case ERR_INVALID_ARGS:
+    case ERR_BAD_HANDLE:
+    case ERR_WRONG_TYPE:
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
