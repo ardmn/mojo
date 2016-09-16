@@ -22,8 +22,12 @@ static_assert(MOJO_HANDLE_RIGHT_WRITE == MX_RIGHT_WRITE,
               "RIGHT_WRITE must match");
 static_assert(MOJO_HANDLE_RIGHT_EXECUTE == MX_RIGHT_EXECUTE,
               "RIGHT_EXECUTE must match");
-// TODO(vtl): Add get/set options rights to Magenta, and debug to Mojo (and
-// align their values).
+static_assert(MOJO_HANDLE_RIGHT_MAP == MX_RIGHT_MAP, "RIGHT_MAP must match");
+static_assert(MOJO_HANDLE_RIGHT_GET_OPTIONS == MX_RIGHT_GET_PROPERTY,
+              "RIGHT_GET_OPTIONS/PROPERTY must match");
+static_assert(MOJO_HANDLE_RIGHT_SET_OPTIONS == MX_RIGHT_SET_PROPERTY,
+              "RIGHT_SET_OPTIONS/PROPERTY must match");
+// TODO(vtl): Add debug to Mojo.
 
 static_assert(MOJO_HANDLE_SIGNAL_NONE == MX_SIGNAL_NONE,
               "SIGNAL_NONE must match");
@@ -33,6 +37,18 @@ static_assert(MOJO_HANDLE_SIGNAL_WRITABLE == MX_SIGNAL_WRITABLE,
               "SIGNAL_WRITABLE must match");
 static_assert(MOJO_HANDLE_SIGNAL_PEER_CLOSED == MX_SIGNAL_PEER_CLOSED,
               "PEER_CLOSED must match");
+static_assert(MOJO_HANDLE_SIGNAL_SIGNAL0 == MX_SIGNAL_SIGNAL0,
+              "SIGNAL0 must match");
+static_assert(MOJO_HANDLE_SIGNAL_SIGNAL1 == MX_SIGNAL_SIGNAL1,
+              "SIGNAL1 must match");
+static_assert(MOJO_HANDLE_SIGNAL_SIGNAL2 == MX_SIGNAL_SIGNAL2,
+              "SIGNAL2 must match");
+static_assert(MOJO_HANDLE_SIGNAL_SIGNAL3 == MX_SIGNAL_SIGNAL3,
+              "SIGNAL3 must match");
+static_assert(MOJO_HANDLE_SIGNAL_SIGNAL4 == MX_SIGNAL_SIGNAL4,
+              "SIGNAL4 must match");
+// TODO(vtl): Add {READ,WRITE}_THRESHOLD (once Magenta has them).
+
 static_assert(sizeof(struct MojoHandleSignalsState) ==
                   sizeof(mx_signals_state_t),
               "Signals state structs must match");
