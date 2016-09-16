@@ -11,6 +11,7 @@ shared_library("libmojo") {
     "handle.c",
     "message_pipe.c",
     "mojo_export.h",
+    "options.h",
     "time.c",
     "time_utils.h",
     "wait.c",

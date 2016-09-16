@@ -12,6 +12,10 @@
 #include <mojo/system/result.h>
 
 #include "mojo/system/mojo_export.h"
+#include "mojo/system/options.h"
+
+// TODO(vtl): Need assertion that |MojoCreateDataPipeOptions| flags and
+// |mx_datapipe_create()| flags are the same (currently, there are no flags).
 
 static_assert(MOJO_WRITE_DATA_FLAG_ALL_OR_NONE ==
                   MX_DATAPIPE_WRITE_FLAG_ALL_OR_NONE,
@@ -37,21 +41,26 @@ MOJO_EXPORT MojoResult
 MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
                    MojoHandle* data_pipe_producer_handle,
                    MojoHandle* data_pipe_consumer_handle) {
-  uint32_t element_num_bytes = 1u;
-  uint32_t capacity_num_bytes = 0u;
+  struct MojoCreateDataPipeOptions validated_options = {
+      sizeof(struct MojoCreateDataPipeOptions),  // struct_size
+      MOJO_CREATE_DATA_PIPE_OPTIONS_FLAG_NONE,   // flags
+      1u,                                        // element_num_bytes
+      0u,                                        // capacity_num_bytes
+  };
   if (options) {
-    if (options->flags) {
-      // TODO: Support flags
-      return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-    }
-    element_num_bytes = options->element_num_bytes;
-    if (options->capacity_num_bytes)
-      capacity_num_bytes = options->capacity_num_bytes;
+    if (!IS_VALID_OPTIONS_STRUCT(MojoCreateDataPipeOptions, options))
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+    READ_OPTIONS_FIELD_IF_PRESENT(MojoCreateDataPipeOptions, flags,
+                                  &validated_options, options);
+    READ_OPTIONS_FIELD_IF_PRESENT(MojoCreateDataPipeOptions, element_num_bytes,
+                                  &validated_options, options);
+    READ_OPTIONS_FIELD_IF_PRESENT(MojoCreateDataPipeOptions, capacity_num_bytes,
+                                  &validated_options, options);
   }
   mx_handle_t mx_consumer_handle = 0u;
   mx_handle_t mx_producer_handle = mx_datapipe_create(
-      0u,  // TODO: Flags
-      element_num_bytes, capacity_num_bytes, &mx_consumer_handle);
+      validated_options.flags, validated_options.element_num_bytes,
+      validated_options.capacity_num_bytes, &mx_consumer_handle);
   if (mx_producer_handle < 0) {
     switch (mx_producer_handle) {
       case ERR_INVALID_ARGS:
