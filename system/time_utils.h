@@ -11,11 +11,11 @@
 // MojoTimeTicks is in microseconds.
 // mx_time_t is in nanoseconds.
 
-inline MojoTimeTicks TimeToMojoTicks(mx_time_t t) {
+static inline MojoTimeTicks TimeToMojoTicks(mx_time_t t) {
   return (MojoTimeTicks)t / 1000u;
 }
 
-inline mx_time_t MojoDeadlineToTime(MojoDeadline deadline) {
+static inline mx_time_t MojoDeadlineToTime(MojoDeadline deadline) {
   if (deadline == MOJO_DEADLINE_INDEFINITE)
     return MX_TIME_INFINITE;
   // TODO(abarth): Handle overflow.
