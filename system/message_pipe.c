@@ -17,9 +17,9 @@ MojoCreateMessagePipe(const struct MojoCreateMessagePipeOptions* options,
                       MojoHandle* message_pipe_handle0,
                       MojoHandle* message_pipe_handle1) {
   if (options && options->flags != MOJO_CREATE_MESSAGE_PIPE_OPTIONS_FLAG_NONE)
-    return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+    return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   mx_handle_t mx_handles[2];
-  mx_status_t status = mx_msgpipe_create(mx_handles, 0);
+  mx_status_t status = mx_msgpipe_create(mx_handles, 0u);
   if (status != NO_ERROR) {
     switch (status) {
       case ERR_INVALID_ARGS:

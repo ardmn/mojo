@@ -7,6 +7,7 @@ shared_library("libmojo") {
   sources = [
     "buffer.c",
     "data_pipe.c",
+    "event_pair.c",
     "handle.c",
     "message_pipe.c",
     "mojo_export.h",
