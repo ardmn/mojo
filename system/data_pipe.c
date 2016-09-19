@@ -79,14 +79,89 @@ MojoCreateDataPipe(const struct MojoCreateDataPipeOptions* options,
 MOJO_EXPORT MojoResult MojoSetDataPipeProducerOptions(
     MojoHandle data_pipe_producer_handle,
     const struct MojoDataPipeProducerOptions* options) {
-  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
+  // Note: Null |options| resets back to default.
+  uint32_t threshold_u32 = 0u;
+  if (options) {
+    if (!IS_VALID_OPTIONS_STRUCT(MojoDataPipeProducerOptions, options))
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+
+    // TODO(vtl): We treat |write_threshold_num_bytes| as optional for setting,
+    // but required for getting, which is inconsistent. (This inconsistency
+    // exists in the domokit EDK implementation.)
+    if (!HAS_OPTIONS_FIELD(MojoDataPipeProducerOptions,
+                           write_threshold_num_bytes, options))
+      return MOJO_RESULT_OK;
+    READ_OPTIONS_FIELD_TO(write_threshold_num_bytes, options, &threshold_u32);
+  }
+
+  const mx_size_t threshold = threshold_u32;
+  mx_status_t result = mx_object_set_property(
+      (mx_handle_t)data_pipe_producer_handle, MX_PROP_DATAPIPE_WRITE_THRESHOLD,
+      &threshold, sizeof(threshold));
+  if (result < 0) {
+    switch (result) {
+      case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+      case ERR_ACCESS_DENIED:
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
+      // TODO(vtl): This seems like a dubious choice of error code (on the
+      // Magenta side), and also a dubious "translation" (though we should never
+      // get this).
+      case ERR_BUFFER_TOO_SMALL:
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
+      default:
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
+    }
+  }
+  return MOJO_RESULT_OK;
 }
 
 MOJO_EXPORT MojoResult
 MojoGetDataPipeProducerOptions(MojoHandle data_pipe_producer_handle,
                                struct MojoDataPipeProducerOptions* options,
                                uint32_t options_num_bytes) {
-  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
+  // Note: If/when |MojoDataPipeProducerOptions| is extended beyond its initial
+  // definition, more work will be necessary. (See the definition of
+  // |MojoGetDataPipeProducerOptions()| in <mojo/system/data_pipe.h>.)
+  static_assert(sizeof(struct MojoDataPipeProducerOptions) == 8u,
+                "MojoDataPipeProducerOptions has been extended!");
+
+  // TODO(vtl): We treat |write_threshold_num_bytes| as optional for setting,
+  // but required for getting, which is inconsistent. (This inconsistency exists
+  // in the domokit EDK implementation.)
+  if (options_num_bytes < sizeof(struct MojoDataPipeProducerOptions))
+    return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+
+  mx_size_t threshold = 0u;
+  mx_status_t result = mx_object_get_property(
+      (mx_handle_t)data_pipe_producer_handle, MX_PROP_DATAPIPE_WRITE_THRESHOLD,
+      &threshold, sizeof(threshold));
+  if (result < 0) {
+    switch (result) {
+      case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+      case ERR_ACCESS_DENIED:
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
+      // TODO(vtl): This seems like a dubious choice of error code (on the
+      // Magenta side), and also a dubious "translation" (though we should never
+      // get this).
+      case ERR_BUFFER_TOO_SMALL:
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
+      default:
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
+    }
+  }
+  // TODO(vtl): Handle overflow?
+  struct MojoDataPipeProducerOptions model_options = {
+      sizeof(struct MojoDataPipeProducerOptions),  // |struct_size|.
+      (uint32_t)threshold,  // |write_threshold_num_bytes|.
+  };
+  memcpy(options, &model_options, sizeof(model_options));
+  return MOJO_RESULT_OK;
 }
 
 MOJO_EXPORT MojoResult MojoWriteData(MojoHandle data_pipe_producer_handle,
@@ -172,14 +247,89 @@ MOJO_EXPORT MojoResult MojoEndWriteData(MojoHandle data_pipe_producer_handle,
 MOJO_EXPORT MojoResult MojoSetDataPipeConsumerOptions(
     MojoHandle data_pipe_consumer_handle,
     const struct MojoDataPipeConsumerOptions* options) {
-  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
+  // Note: Null |options| resets back to default.
+  uint32_t threshold_u32 = 0u;
+  if (options) {
+    if (!IS_VALID_OPTIONS_STRUCT(MojoDataPipeConsumerOptions, options))
+      return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+
+    // TODO(vtl): We treat |read_threshold_num_bytes| as optional for setting,
+    // but required for getting, which is inconsistent. (This inconsistency
+    // exists in the domokit EDK implementation.)
+    if (!HAS_OPTIONS_FIELD(MojoDataPipeConsumerOptions,
+                           read_threshold_num_bytes, options))
+      return MOJO_RESULT_OK;
+    READ_OPTIONS_FIELD_TO(read_threshold_num_bytes, options, &threshold_u32);
+  }
+
+  const mx_size_t threshold = threshold_u32;
+  mx_status_t result = mx_object_set_property(
+      (mx_handle_t)data_pipe_consumer_handle, MX_PROP_DATAPIPE_READ_THRESHOLD,
+      &threshold, sizeof(threshold));
+  if (result < 0) {
+    switch (result) {
+      case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+      case ERR_ACCESS_DENIED:
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
+      // TODO(vtl): This seems like a dubious choice of error code (on the
+      // Magenta side), and also a dubious "translation" (though we should never
+      // get this).
+      case ERR_BUFFER_TOO_SMALL:
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
+      default:
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
+    }
+  }
+  return MOJO_RESULT_OK;
 }
 
 MOJO_EXPORT MojoResult
 MojoGetDataPipeConsumerOptions(MojoHandle data_pipe_consumer_handle,
                                struct MojoDataPipeConsumerOptions* options,
                                uint32_t options_num_bytes) {
-  return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
+  // Note: If/when |MojoDataPipeConsumerOptions| is extended beyond its initial
+  // definition, more work will be necessary. (See the definition of
+  // |MojoGetDataPipeConsumerOptions()| in <mojo/system/data_pipe.h>.)
+  static_assert(sizeof(struct MojoDataPipeConsumerOptions) == 8u,
+                "MojoDataPipeConsumerOptions has been extended!");
+
+  // TODO(vtl): We treat |read_threshold_num_bytes| as optional for setting,
+  // but required for getting, which is inconsistent. (This inconsistency exists
+  // in the domokit EDK implementation.)
+  if (options_num_bytes < sizeof(struct MojoDataPipeConsumerOptions))
+    return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+
+  mx_size_t threshold = 0u;
+  mx_status_t result = mx_object_get_property(
+      (mx_handle_t)data_pipe_consumer_handle, MX_PROP_DATAPIPE_READ_THRESHOLD,
+      &threshold, sizeof(threshold));
+  if (result < 0) {
+    switch (result) {
+      case ERR_INVALID_ARGS:
+      case ERR_BAD_HANDLE:
+      case ERR_WRONG_TYPE:
+        return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
+      case ERR_ACCESS_DENIED:
+        return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
+      // TODO(vtl): This seems like a dubious choice of error code (on the
+      // Magenta side), and also a dubious "translation" (though we should never
+      // get this).
+      case ERR_BUFFER_TOO_SMALL:
+        return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
+      default:
+        return MOJO_SYSTEM_RESULT_UNKNOWN;
+    }
+  }
+  // TODO(vtl): Handle overflow?
+  struct MojoDataPipeConsumerOptions model_options = {
+      sizeof(struct MojoDataPipeConsumerOptions),  // |struct_size|.
+      (uint32_t)threshold,  // |read_threshold_num_bytes|.
+  };
+  memcpy(options, &model_options, sizeof(model_options));
+  return MOJO_RESULT_OK;
 }
 
 MOJO_EXPORT MojoResult MojoReadData(MojoHandle data_pipe_consumer_handle,
