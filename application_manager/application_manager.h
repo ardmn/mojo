@@ -29,12 +29,13 @@ class ApplicationManager {
                             InterfaceRequest<ServiceProvider> services);
 
   void StartApplicationUsingContentHandler(
-      const std::string& content_handler_name, URLResponsePtr response,
+      const std::string& content_handler_name,
+      URLResponsePtr response,
       InterfaceRequest<Application> application_request);
 
- private:
   ApplicationInstance* GetOrStartApplicationInstance(std::string name);
 
+ private:
   ApplicationTable table_;
   std::unordered_map<std::string, std::vector<std::string>> args_for_;
 

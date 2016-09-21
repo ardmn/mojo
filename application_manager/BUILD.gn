@@ -26,6 +26,8 @@ source_set("application_manager_lib") {
     "application_manager.h",
     "application_table.cc",
     "application_table.h",
+    "command_listener.cc",
+    "command_listener.h",
     "shell_impl.cc",
     "shell_impl.h",
   ]
