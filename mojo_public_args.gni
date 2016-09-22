@@ -21,3 +21,7 @@ mojo_build_network_service_from_source = false
 
 # This variable specifies a suitable gtest target.
 mojo_gtest = "//third_party/gtest"
+
+# Ignore DartPackage= annotations in mojom files.
+# TODO(jamesr): Remove this when everything is transitioned to the new layout.
+ignore_dart_package_annotations = true
