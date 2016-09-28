@@ -17,6 +17,7 @@ CommandListener::CommandListener(ApplicationManager* manager)
 CommandListener::~CommandListener() = default;
 
 void CommandListener::StartListening(ScopedMessagePipeHandle handle) {
+  FTL_DCHECK(handle.is_valid());
   FTL_DCHECK(!handle_.is_valid());
   handle_ = std::move(handle);
   WaitForCommand();

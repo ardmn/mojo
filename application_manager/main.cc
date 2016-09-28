@@ -44,7 +44,8 @@ int main(int argc, char** argv) {
   message_loop.task_runner()->PostTask([&command_listener] {
     mojo::ScopedMessagePipeHandle launcher(mojo::MessagePipeHandle(
         mxio_get_startup_handle(MX_HND_TYPE_APPLICATION_LAUNCHER)));
-    command_listener.StartListening(std::move(launcher));
+    if (launcher.is_valid())
+      command_listener.StartListening(std::move(launcher));
   });
 
   message_loop.Run();
