@@ -42,8 +42,14 @@ void Ignored(bool success) {
 }
 
 std::string GetPathFromApplicationName(const std::string& name) {
-  if (name.find(kMojoScheme) == 0)
-    return kMojoAppDir + name.substr(kMojoSchemeLength);
+  if (name.find(kMojoScheme) == 0) {
+    // Generate path from name, excluding any trailing query parameters.
+    size_t query_pos = name.find('?', kMojoSchemeLength);
+    if (query_pos == std::string::npos)
+      return kMojoAppDir + name.substr(kMojoSchemeLength);
+    return kMojoAppDir +
+           name.substr(kMojoSchemeLength, query_pos - kMojoSchemeLength);
+  }
   return std::string();
 }
 
