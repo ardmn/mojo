@@ -11,33 +11,39 @@
 #include <unordered_map>
 #include <vector>
 
-#include "lib/ftl/command_line.h"
+#include "lib/ftl/files/file.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "mojo/application_manager/application_manager.h"
 #include "mojo/application_manager/command_listener.h"
+#include "mojo/application_manager/startup_config.h"
+
+constexpr char kConfigPath[] = "/boot/data/application_manager/startup.config";
+
+static void LoadStartupConfig(mojo::StartupConfig* config) {
+  std::string data;
+  if (!files::ReadFileToString(kConfigPath, &data)) {
+    fprintf(stderr, "application_manager: Failed to read startup config: %s\n",
+            kConfigPath);
+  } else if (!config->Parse(data)) {
+    fprintf(stderr, "application_manager: Failed to parse startup config: %s\n",
+            kConfigPath);
+  }
+}
 
 int main(int argc, char** argv) {
-  auto args = ftl::CommandLineFromArgcArgv(argc, argv);
+  mojo::StartupConfig config;
+  LoadStartupConfig(&config);
 
-  std::string initial_app;
-  const auto& positional_args = args.positional_args();
-  if (positional_args.size() > 0)
-    initial_app = positional_args[0];
-
-  std::unordered_map<std::string, std::vector<std::string>> args_for;
-  // TODO(alhaad): This implementation passes all the command-line arguments
-  // to the initial application. Having an '--args-for' option is desirable.
-  args_for[initial_app] = args.positional_args();
-  mojo::ApplicationManager manager(std::move(args_for));
+  mojo::ApplicationManager manager(config.TakeArgsFor());
   mojo::CommandListener command_listener(&manager);
 
   mtl::MessageLoop message_loop;
 
-  if (!initial_app.empty()) {
-    message_loop.task_runner()->PostTask([&manager, &initial_app] {
-      if (!manager.StartInitialApplication(initial_app))
-        fprintf(stderr, "Unable to start initial application: %s\n",
-                initial_app.c_str());
+  std::vector<std::string> initial_apps = config.TakeInitialApps();
+  if (!initial_apps.empty()) {
+    message_loop.task_runner()->PostTask([&manager, &initial_apps] {
+      for (const std::string& app : initial_apps)
+        manager.GetOrStartApplicationInstance(app);
     });
   }
 

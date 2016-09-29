@@ -16,10 +16,12 @@
 
 namespace mojo {
 
+using ApplicationArgs =
+    std::unordered_map<std::string, std::vector<std::string>>;
+
 class ApplicationManager {
  public:
-  explicit ApplicationManager(
-      std::unordered_map<std::string, std::vector<std::string>>&& args_for);
+  explicit ApplicationManager(ApplicationArgs args_for);
   ~ApplicationManager();
 
   bool StartInitialApplication(std::string name);

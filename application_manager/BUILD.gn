@@ -5,12 +5,15 @@
 executable("application_manager") {
   sources = [
     "main.cc",
+    "startup_config.cc",
+    "startup_config.h",
   ]
 
   deps = [
     ":application_manager_lib",
     "//lib/ftl",
     "//lib/mtl",
+    "//third_party/rapidjson",
   ]
 }
 

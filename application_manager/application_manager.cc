@@ -7,6 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <utility>
+
 #include "lib/ftl/command_line.h"
 #include "lib/ftl/logging.h"
 #include "mojo/application_manager/application_instance.h"
@@ -14,9 +16,8 @@
 
 namespace mojo {
 
-ApplicationManager::ApplicationManager(
-    std::unordered_map<std::string, std::vector<std::string>>&& args_for)
-    : args_for_(args_for) {}
+ApplicationManager::ApplicationManager(ApplicationArgs args_for)
+    : args_for_(std::move(args_for)) {}
 
 ApplicationManager::~ApplicationManager() {}
 
@@ -54,7 +55,8 @@ ApplicationInstance* ApplicationManager::GetOrStartApplicationInstance(
     std::string name) {
   ApplicationInstance* instance = table_.GetOrStartApplication(this, name);
   if (!instance) {
-    fprintf(stderr, "error: Failed to start application %s", name.c_str());
+    fprintf(stderr, "application_manager: Failed to start application %s",
+            name.c_str());
     return nullptr;
   }
   if (!instance->is_initialized()) {
