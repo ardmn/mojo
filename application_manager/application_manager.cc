@@ -21,11 +21,6 @@ ApplicationManager::ApplicationManager(ApplicationArgs args_for)
 
 ApplicationManager::~ApplicationManager() {}
 
-bool ApplicationManager::StartInitialApplication(std::string name) {
-  FTL_DCHECK(table_.is_empty());
-  return GetOrStartApplicationInstance(std::move(name));
-}
-
 void ApplicationManager::ConnectToApplication(
     const std::string& application_name,
     const std::string& requestor_name,

@@ -4,21 +4,6 @@
 
 executable("application_manager") {
   sources = [
-    "main.cc",
-    "startup_config.cc",
-    "startup_config.h",
-  ]
-
-  deps = [
-    ":application_manager_lib",
-    "//lib/ftl",
-    "//lib/mtl",
-    "//third_party/rapidjson",
-  ]
-}
-
-source_set("application_manager_lib") {
-  sources = [
     "application_connector_impl.cc",
     "application_connector_impl.h",
     "application_instance.cc",
@@ -31,8 +16,11 @@ source_set("application_manager_lib") {
     "application_table.h",
     "command_listener.cc",
     "command_listener.h",
+    "main.cc",
     "shell_impl.cc",
     "shell_impl.h",
+    "startup_config.cc",
+    "startup_config.h",
   ]
 
   deps = [
@@ -45,6 +33,7 @@ source_set("application_manager_lib") {
     "//mojo/public/interfaces/network",
     "//mojo/services/content_handler/interfaces",
     "//mojo/system:libmojo",
+    "//third_party/rapidjson",
   ]
 
   libs = [

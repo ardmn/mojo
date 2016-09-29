@@ -24,8 +24,6 @@ class ApplicationManager {
   explicit ApplicationManager(ApplicationArgs args_for);
   ~ApplicationManager();
 
-  bool StartInitialApplication(std::string name);
-
   void ConnectToApplication(const std::string& application_name,
                             const std::string& requestor_name,
                             InterfaceRequest<ServiceProvider> services);
