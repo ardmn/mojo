@@ -29,7 +29,8 @@ class CommandListener {
 
  private:
   void WaitForCommand();
-  void ExecuteCommand();
+  void ReadCommand();
+  void ExecuteCommand(std::string command);
 
   ApplicationManager* const manager_;
   ScopedMessagePipeHandle handle_;

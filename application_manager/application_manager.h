@@ -33,7 +33,9 @@ class ApplicationManager {
       URLResponsePtr response,
       InterfaceRequest<Application> application_request);
 
-  ApplicationInstance* GetOrStartApplicationInstance(std::string name);
+  ApplicationInstance* GetOrStartApplicationInstance(
+      std::string name,
+      std::vector<std::string>* override_args = nullptr);
 
  private:
   ApplicationTable table_;

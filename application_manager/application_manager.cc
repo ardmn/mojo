@@ -13,6 +13,7 @@
 #include "lib/ftl/logging.h"
 #include "mojo/application_manager/application_instance.h"
 #include "mojo/application_manager/shell_impl.h"
+#include "mojo/public/cpp/bindings/formatting.h"
 
 namespace mojo {
 
@@ -47,7 +48,8 @@ void ApplicationManager::StartApplicationUsingContentHandler(
 }
 
 ApplicationInstance* ApplicationManager::GetOrStartApplicationInstance(
-    std::string name) {
+    std::string name,
+    std::vector<std::string>* override_args) {
   ApplicationInstance* instance = table_.GetOrStartApplication(this, name);
   if (!instance) {
     fprintf(stderr, "application_manager: Failed to start application %s",
@@ -55,13 +57,23 @@ ApplicationInstance* ApplicationManager::GetOrStartApplicationInstance(
     return nullptr;
   }
   if (!instance->is_initialized()) {
+    Array<String> args;
+    if (override_args) {
+      args = Array<String>::From(*override_args);
+    } else {
+      const auto& it = args_for_.find(name);
+      if (it != args_for_.end())
+        args = Array<String>::From(it->second);
+    }
+    FTL_DLOG(INFO) << "Starting application: \"" << name
+                   << "\", with args: " << args;
     instance->Initialize(std::make_unique<ShellImpl>(name, this),
-                         args_for_.count(name)
-                             ? mojo::Array<mojo::String>::From(args_for_[name])
-                             : nullptr,
-                         name);
-    instance->set_connection_error_handler(
-        [this, instance]() { table_.StopApplication(instance->name()); });
+                         std::move(args), name);
+    instance->set_connection_error_handler([this, instance]() {
+      FTL_DLOG(INFO) << "Application terminated: \"" << instance->name()
+                     << "\"";
+      table_.StopApplication(instance->name());
+    });
   }
   return instance;
 }
