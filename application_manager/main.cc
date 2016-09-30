@@ -17,38 +17,56 @@
 #include "mojo/application_manager/command_listener.h"
 #include "mojo/application_manager/startup_config.h"
 
-constexpr char kConfigPath[] = "/boot/data/application_manager/startup.config";
+constexpr char kDefaultConfigPath[] =
+    "/boot/data/application_manager/startup.config";
 
-static void LoadStartupConfig(mojo::StartupConfig* config) {
+static void LoadStartupConfig(mojo::StartupConfig* config,
+                              const std::string& config_path) {
   std::string data;
-  if (!files::ReadFileToString(kConfigPath, &data)) {
+  if (!files::ReadFileToString(config_path, &data)) {
     fprintf(stderr, "application_manager: Failed to read startup config: %s\n",
-            kConfigPath);
+            config_path.c_str());
   } else if (!config->Parse(data)) {
     fprintf(stderr, "application_manager: Failed to parse startup config: %s\n",
-            kConfigPath);
+            config_path.c_str());
   }
 }
 
 int main(int argc, char** argv) {
-  auto args = ftl::CommandLineFromArgcArgv(argc, argv);
+  auto command_line = ftl::CommandLineFromArgcArgv(argc, argv);
+
+  std::string config_path;
+  command_line.GetOptionValue("config", &config_path);
+
+  const auto& positional_args = command_line.positional_args();
+  if (config_path.empty() && positional_args.empty())
+    config_path = kDefaultConfigPath;
 
   std::vector<std::string> initial_apps;
   mojo::ApplicationArgs args_for;
-
-  const auto& positional_args = args.positional_args();
-  if (positional_args.size() > 0) {
-    // TODO(alhaad): This implementation passes all the command-line arguments
-    // to the initial application. Having an '--args-for' option is desirable.
-    std::string initial_app = positional_args[0];
-    initial_apps.push_back(initial_app);
-    args_for[initial_app] = positional_args;
-  } else {
+  if (!config_path.empty()) {
     mojo::StartupConfig config;
-    LoadStartupConfig(&config);
+    LoadStartupConfig(&config, config_path);
     initial_apps = config.TakeInitialApps();
     args_for = config.TakeArgsFor();
   }
+
+  if (!positional_args.empty()) {
+    // TODO(alhaad): This implementation passes all the command-line arguments
+    // to the initial application. Having an '--args-for' option is desirable.
+    std::string initial_app = positional_args[0];
+    positional_args.erase(positional_args.begin());
+    initial_apps.push_back(initial_app);
+    args_for[initial_app] = positional_args;
+  }
+
+  // TODO(jeffbrown): If there's already a running instance of
+  // application_manager, it might be nice to pass the request over to
+  // it instead of starting a whole new instance.  Alternately, we could create
+  // a separate command-line program to act as an interface for modifying
+  // configuration, starting / stopping applications, listing what's running,
+  // printing debugging information, etc.  Having multiple instances of
+  // application manager running is not what we want, in general.
 
   mtl::MessageLoop message_loop;
   mojo::ApplicationManager manager(std::move(args_for));
