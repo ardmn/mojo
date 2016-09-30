@@ -55,9 +55,9 @@ int main(int argc, char** argv) {
     // TODO(alhaad): This implementation passes all the command-line arguments
     // to the initial application. Having an '--args-for' option is desirable.
     std::string initial_app = positional_args[0];
-    positional_args.erase(positional_args.begin());
     initial_apps.push_back(initial_app);
-    args_for[initial_app] = positional_args;
+    args_for[initial_app] = std::vector<std::string>(
+        positional_args.begin() + 1, positional_args.end());
   }
 
   // TODO(jeffbrown): If there's already a running instance of
