@@ -1,0 +1,14 @@
+// Copyright 2016 The Fuchsia Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+module mojo;
+
+struct ICUData {
+  handle vmo;
+};
+
+[ServiceName="mojo::ICUDataProvider"]
+interface ICUDataProvider {
+  ICUDataWithSha1(string sha1hash) => (ICUData? response);
+};
