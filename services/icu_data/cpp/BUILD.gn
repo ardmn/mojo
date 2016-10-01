@@ -1,0 +1,43 @@
+# Copyright 2016 The Fuchsia Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+
+import("//mojo/public/mojo_sdk.gni")
+
+action("generate_icu_constants") {
+  script = "generate_icu_constants.py"
+
+  inputs = [
+    "$root_build_dir/icudtl.dat",
+  ]
+
+  outputs = [
+    "$root_gen_dir/mojo/services/icu_data/cpp/constants.cc",
+  ]
+
+  args = rebase_path(inputs + outputs, root_build_dir)
+
+  deps = [
+    "//third_party/icu:icudata",
+  ]
+}
+
+mojo_sdk_source_set("cpp") {
+  restrict_external_deps = false
+  #TODO(mikejurka): do we want this?
+  #public_configs = [ "../../../public/build/config:mojo_services" ]
+
+  sources = [
+    "$root_gen_dir/mojo/services/icu_data/cpp/constants.cc",
+    "constants.h",
+    "icu_data.cc",
+    "icu_data.h",
+  ]
+
+  deps = [
+    "../interfaces",
+    "//mojo/public/cpp/application",
+    "//third_party/icu",
+    ":generate_icu_constants",
+  ]
+}
