@@ -67,7 +67,8 @@ class ShapesApp : public mojo::ApplicationImplBase {
         sk_color_type = kRGB_565_SkColorType;
         break;
       case mojo::FramebufferFormat::ARGB_8888:
-        sk_color_type = kRGBA_8888_SkColorType;
+      case mojo::FramebufferFormat::RGB_x888:
+        sk_color_type = kN32_SkColorType;
         break;
       default:
         printf("Unknown color type %d\n", info_->format);
