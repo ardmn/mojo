@@ -52,7 +52,7 @@ ApplicationInstance* ApplicationManager::GetOrStartApplicationInstance(
     std::vector<std::string>* override_args) {
   ApplicationInstance* instance = table_.GetOrStartApplication(this, name);
   if (!instance) {
-    fprintf(stderr, "application_manager: Failed to start application %s",
+    fprintf(stderr, "application_manager: Failed to start application %s\n",
             name.c_str());
     return nullptr;
   }
