@@ -35,7 +35,7 @@ constexpr char kMojoMagic[] = "#!mojo ";
 constexpr size_t kMojoMagicLength = sizeof(kMojoMagic) - 1;
 constexpr size_t kMaxShebangLength = 2048;
 
-void Ignored(bool success) {
+void Ignored(bool success, ftl::UniqueFD fd) {
   // There's not much we can do with this success value. If we didn't succeed in
   // filling the data pipe with content, that could just mean the content
   // handler wasn't interested in the data and closed its end of the pipe before
