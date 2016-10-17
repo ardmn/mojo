@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <magenta/syscalls.h>
+#include <magenta/syscalls/object.h>
 #include <mojo/system/data_pipe.h>
 #include <mojo/system/result.h>
 

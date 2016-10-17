@@ -8,6 +8,7 @@
 
 #include <assert.h>
 #include <magenta/syscalls.h>
+#include <magenta/syscalls/object.h>
 #include <mojo/system/result.h>
 
 #include "mojo/system/mojo_export.h"
