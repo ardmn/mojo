@@ -85,7 +85,9 @@ mojo::InterfaceRequest<mojo::Application> LaunchWithContentHandler(
   response->status_code = 200;
   response->url = GetUriFromPath(path);
   mojo::DataPipe data_pipe;
-  response->body = std::move(data_pipe.consumer_handle);
+  URLBodyPtr body = URLBody::New();
+  body->set_stream(std::move(data_pipe.consumer_handle));
+  response->body = std::move(body);
   mtl::CopyFromFileDescriptor(
       std::move(fd), std::move(data_pipe.producer_handle),
       // TODO(abarth): Move file tasks to a background thread.
