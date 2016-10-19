@@ -56,7 +56,6 @@ MOJO_EXPORT MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
     case ERR_BAD_STATE:
-      // Notice the different semantics than mx_msgpipe_read.
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
     case ERR_NO_MEMORY:
       return MOJO_SYSTEM_RESULT_RESOURCE_EXHAUSTED;
@@ -86,8 +85,7 @@ MOJO_EXPORT MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
       return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
     case ERR_ACCESS_DENIED:
       return MOJO_SYSTEM_RESULT_PERMISSION_DENIED;
-    case ERR_BAD_STATE:
-      // Notice the different semantics than mx_msgpipe_write.
+    case ERR_SHOULD_WAIT:
       return MOJO_SYSTEM_RESULT_SHOULD_WAIT;
     case ERR_REMOTE_CLOSED:
       return MOJO_SYSTEM_RESULT_FAILED_PRECONDITION;
