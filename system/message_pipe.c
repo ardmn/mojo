@@ -19,7 +19,7 @@ MojoCreateMessagePipe(const struct MojoCreateMessagePipeOptions* options,
   if (options && options->flags != MOJO_CREATE_MESSAGE_PIPE_OPTIONS_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
   mx_handle_t mx_handles[2];
-  mx_status_t status = mx_msgpipe_create(mx_handles, 0u);
+  mx_status_t status = mx_channel_create(0u, &mx_handles[0], &mx_handles[1]);
   if (status != NO_ERROR) {
     switch (status) {
       case ERR_INVALID_ARGS:
@@ -44,8 +44,8 @@ MOJO_EXPORT MojoResult MojoWriteMessage(MojoHandle message_pipe_handle,
   mx_handle_t* mx_handles = (mx_handle_t*)handles;
   // TODO(abarth): Handle messages that are too big to fit.
   mx_status_t status =
-      mx_msgpipe_write((mx_handle_t)message_pipe_handle, bytes, num_bytes,
-                       mx_handles, num_handles, flags);
+      mx_channel_write((mx_handle_t)message_pipe_handle, flags, bytes,
+                       num_bytes, mx_handles, num_handles);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
@@ -73,9 +73,12 @@ MOJO_EXPORT MojoResult MojoReadMessage(MojoHandle message_pipe_handle,
                                        MojoReadMessageFlags flags) {
   mx_handle_t* mx_handles = (mx_handle_t*)handles;
   // TODO(abarth): Handle messages that were too big to fit.
+  uint32_t nbytes = num_bytes ? *num_bytes : 0u;
+  uint32_t nhandles = num_handles ? *num_handles : 0u;
   mx_status_t status =
-      mx_msgpipe_read((mx_handle_t)message_pipe_handle, bytes, num_bytes,
-                      mx_handles, num_handles, flags);
+      mx_channel_read((mx_handle_t)message_pipe_handle, flags, bytes,
+                      nbytes, num_bytes, mx_handles, nhandles,
+                      num_handles);
   switch (status) {
     case NO_ERROR:
       return MOJO_RESULT_OK;
