@@ -7,7 +7,6 @@
 #include <string>
 #include <utility>
 
-#include <magenta/process.h>
 #include <magenta/syscalls.h>
 #include <mojo/system/main.h>
 

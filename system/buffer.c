@@ -6,7 +6,6 @@
 
 #include <mojo/system/buffer.h>
 
-#include <magenta/process.h>
 #include <magenta/syscalls.h>
 #include <mojo/system/buffer.h>
 #include <mojo/system/result.h>
