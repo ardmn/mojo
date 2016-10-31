@@ -12,5 +12,5 @@
 #include "mojo/system/time_utils.h"
 
 MOJO_EXPORT MojoTimeTicks MojoGetTimeTicksNow() {
-  return TimeToMojoTicks(mx_current_time());
+  return TimeToMojoTicks(mx_time_get(MX_CLOCK_MONOTONIC));
 }
