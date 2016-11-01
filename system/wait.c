@@ -18,10 +18,16 @@ MOJO_EXPORT MojoResult MojoWait(MojoHandle handle,
                                 MojoDeadline deadline,
                                 struct MojoHandleSignalsState* signals_state) {
   mx_time_t mx_deadline = MojoDeadlineToTime(deadline);
-  mx_signals_state_t* mx_signals_state = (mx_signals_state_t*)signals_state;
 
+  mx_signals_t pending;
   mx_status_t status = mx_handle_wait_one((mx_handle_t)handle, signals,
-                                          mx_deadline, mx_signals_state);
+                                          mx_deadline, &pending);
+  if (signals_state) {
+    signals_state->satisfied_signals = pending;
+    // NOTE: This is wrong (and will break the tests) but no one should be
+    // relying on this state anymore and we will be deleting all of this soon.
+    signals_state->satisfiable_signals = 0;
+  }
 
   switch (status) {
     case NO_ERROR:
