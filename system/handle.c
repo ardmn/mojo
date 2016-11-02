@@ -105,10 +105,11 @@ MojoReplaceHandleWithReducedRights(MojoHandle handle,
   if (result != MOJO_RESULT_OK)
     return result;
   MojoHandleRights new_rights = original_rights & ~rights_to_remove;
-  mx_handle_t new_mx_handle =
-      mx_handle_replace((mx_handle_t)handle, new_rights);
-  if (new_mx_handle < 0) {
-    switch (new_mx_handle) {
+  mx_handle_t new_mx_handle = MX_HANDLE_INVALID;
+  mx_status_t status =
+      mx_handle_replace((mx_handle_t)handle, new_rights, &new_mx_handle);
+  if (status < 0) {
+    switch (status) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -133,10 +134,11 @@ MojoDuplicateHandleWithReducedRights(MojoHandle handle,
   if (result != MOJO_RESULT_OK)
     return result;
   MojoHandleRights new_rights = original_rights & ~rights_to_remove;
-  mx_handle_t new_mx_handle =
-      mx_handle_duplicate((mx_handle_t)handle, new_rights);
-  if (new_mx_handle < 0) {
-    switch (new_mx_handle) {
+  mx_handle_t new_mx_handle;
+  mx_status_t status =
+      mx_handle_duplicate((mx_handle_t)handle, new_rights, &new_mx_handle);
+  if (status < 0) {
+    switch (status) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -154,10 +156,11 @@ MojoDuplicateHandleWithReducedRights(MojoHandle handle,
 
 MOJO_EXPORT MojoResult MojoDuplicateHandle(MojoHandle handle,
                                            MojoHandle* new_handle) {
-  mx_handle_t result =
-      mx_handle_duplicate((mx_handle_t)handle, MX_RIGHT_SAME_RIGHTS);
-  if (result < 0) {
-    switch (result) {
+  mx_handle_t mx_new_handle;
+  mx_status_t status =
+      mx_handle_duplicate((mx_handle_t)handle, MX_RIGHT_SAME_RIGHTS, &mx_new_handle);
+  if (status < 0) {
+    switch (status) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
@@ -169,6 +172,6 @@ MOJO_EXPORT MojoResult MojoDuplicateHandle(MojoHandle handle,
         return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
-  *new_handle = (MojoHandle)result;
+  *new_handle = (MojoHandle)mx_new_handle;
   return MOJO_RESULT_OK;
 }
