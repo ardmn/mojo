@@ -18,9 +18,10 @@ MojoCreateSharedBuffer(const struct MojoCreateSharedBufferOptions* options,
                        MojoHandle* shared_buffer_handle) {
   if (options && options->flags != MOJO_CREATE_SHARED_BUFFER_OPTIONS_FLAG_NONE)
     return MOJO_SYSTEM_RESULT_UNIMPLEMENTED;
-  mx_handle_t result = mx_vmo_create(num_bytes);
-  if (result < 0) {
-    switch (result) {
+  mx_handle_t mx_handle;
+  mx_status_t status = mx_vmo_create(num_bytes, 0u, &mx_handle);
+  if (status < 0) {
+    switch (status) {
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
       case ERR_NO_MEMORY:
@@ -29,7 +30,7 @@ MojoCreateSharedBuffer(const struct MojoCreateSharedBufferOptions* options,
         return MOJO_SYSTEM_RESULT_UNKNOWN;
     }
   }
-  *shared_buffer_handle = (MojoHandle)result;
+  *shared_buffer_handle = (MojoHandle)mx_handle;
   return MOJO_RESULT_OK;
 }
 
