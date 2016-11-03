@@ -50,16 +50,6 @@ static_assert(MOJO_HANDLE_SIGNAL_SIGNAL4 == MX_SIGNAL_SIGNAL4,
               "SIGNAL4 must match");
 // TODO(vtl): Add {READ,WRITE}_THRESHOLD (once Magenta has them).
 
-static_assert(sizeof(struct MojoHandleSignalsState) ==
-                  sizeof(mx_signals_state_t),
-              "Signals state structs must match");
-static_assert(offsetof(struct MojoHandleSignalsState, satisfied_signals) ==
-                  offsetof(mx_signals_state_t, satisfied),
-              "Signals state structs must match");
-static_assert(offsetof(struct MojoHandleSignalsState, satisfiable_signals) ==
-                  offsetof(mx_signals_state_t, satisfiable),
-              "Signals state structs must match");
-
 MOJO_EXPORT MojoResult MojoClose(MojoHandle handle) {
   mx_status_t status = mx_handle_close((mx_handle_t)handle);
   switch (status) {
