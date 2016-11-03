@@ -76,11 +76,12 @@ MOJO_EXPORT MojoResult MojoClose(MojoHandle handle) {
 MOJO_EXPORT MojoResult MojoGetRights(MojoHandle handle,
                                      MojoHandleRights* rights) {
   mx_info_handle_basic_t handle_info;
-  mx_ssize_t result = mx_object_get_info(
+  mx_size_t actual;
+  mx_status_t status = mx_object_get_info(
       (mx_handle_t)handle, MX_INFO_HANDLE_BASIC, sizeof(handle_info.rec),
-      &handle_info, sizeof(handle_info));
-  if (result < 0) {
-    switch (result) {
+      &handle_info, sizeof(handle_info), &actual);
+  if (status < 0) {
+    switch (status) {
       case ERR_BAD_HANDLE:
       case ERR_INVALID_ARGS:
         return MOJO_SYSTEM_RESULT_INVALID_ARGUMENT;
