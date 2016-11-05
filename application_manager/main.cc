@@ -18,7 +18,7 @@
 #include "mojo/application_manager/startup_config.h"
 
 constexpr char kDefaultConfigPath[] =
-    "/boot/data/application_manager/startup.config";
+    "/system/data/application_manager/startup.config";
 
 static void LoadStartupConfig(mojo::StartupConfig* config,
                               const std::string& config_path) {

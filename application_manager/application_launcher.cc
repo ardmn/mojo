@@ -27,7 +27,7 @@ namespace {
 
 constexpr char kFileUriPrefix[] = "file://";
 constexpr size_t kFileUriPrefixLength = sizeof(kFileUriPrefix) - 1;
-constexpr char kMojoAppDir[] = "/boot/apps/";
+constexpr char kMojoAppDir[] = "/system/apps/";
 constexpr char kMojoScheme[] = "mojo:";
 constexpr size_t kMojoSchemeLength = sizeof(kMojoScheme) - 1;
 
