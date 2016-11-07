@@ -3,6 +3,8 @@
 # found in the LICENSE file.
 
 executable("application_manager") {
+  output_name = "mojo_application_manager"
+
   sources = [
     "application_connector_impl.cc",
     "application_connector_impl.h",
