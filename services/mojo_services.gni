@@ -8,13 +8,8 @@
 # //mojo/services/X/public/interfaces to this list.
 
 mojo_services = [
-  "//mojo/services/asset_bundle/interfaces",
   "//mojo/services/content_handler/interfaces",
-  "//mojo/services/framebuffer/interfaces",
   "//mojo/services/geometry/interfaces",
-  "//mojo/services/gpu/interfaces",
-  "//mojo/services/icu_data/interfaces",
   "//mojo/services/log/interfaces",
   "//mojo/services/tracing/interfaces",
-  "//mojo/services/ui/fonts/interfaces",
 ]
