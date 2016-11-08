@@ -17,7 +17,7 @@
 
 #include "lib/ftl/files/unique_fd.h"
 #include "lib/ftl/logging.h"
-#include "lib/mtl/data_pipe/files.h"
+#include "lib/mtl/legacy_data_pipe/files.h"
 #include "lib/mtl/tasks/message_loop.h"
 #include "mojo/application_manager/application_manager.h"
 #include "mojo/public/cpp/system/data_pipe.h"
@@ -88,7 +88,7 @@ mojo::InterfaceRequest<mojo::Application> LaunchWithContentHandler(
   URLBodyPtr body = URLBody::New();
   body->set_stream(std::move(data_pipe.consumer_handle));
   response->body = std::move(body);
-  mtl::CopyFromFileDescriptor(
+  mtl::LegacyCopyFromFileDescriptor(
       std::move(fd), std::move(data_pipe.producer_handle),
       // TODO(abarth): Move file tasks to a background thread.
       mtl::MessageLoop::GetCurrent()->task_runner(), Ignored);
